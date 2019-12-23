@@ -1,0 +1,37 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+- task: replacetokens@3
+  inputs:
+    targetFiles: '**/appsettings.json'
+    encoding: 'auto'
+    writeBOM: true
+    actionOnMissing: 'warn'
+    keepToken: true
+    tokenPrefix: '#{'
+    tokenSuffix: '}#'
+
+name: $(Year:yy).$(DayOfYear).$(Rev:rr)
+steps:
+- script: dotnet build --configuration $(build-configuration)
+  displayName: 'dotnet build $(build-configuration)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '-c $(build-configuration) -o $(build-dir) -r $(windows-os)'
+- task: CopyFiles@1
+  inputs:
+    Contents: '**/$(build-dir)/**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
