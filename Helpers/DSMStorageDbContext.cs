@@ -136,7 +136,7 @@ namespace DSM.UI.Api
 
             modelBuilder.Entity<Server>(entity =>
             {
-                entity.ToTable("ServerInventory");
+                entity.ToTable("ServerInventoryX");
 
                 entity.HasOne(x => x.Company)
                 .WithMany(x => x.Servers)
@@ -156,6 +156,15 @@ namespace DSM.UI.Api
                 entity.ToTable("ApplicationServerInventory");
             });
 
+            modelBuilder.Entity<ServerDisk>(entity =>
+            {
+                entity.ToTable("DiskStatus");
+                entity.HasKey("DiskId");
+                entity.HasOne(x => x.Server)
+                .WithMany(x => x.ServerDisks)
+                .HasForeignKey(x => x.ServerId);
+            });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -168,6 +177,7 @@ namespace DSM.UI.Api
         public DbSet<Company> Companies { get; set; }
         public DbSet<ApplicationServer> ApplicationServers { get; set; }
         public DbSet<Server> Servers { get; set; }
+        public DbSet<ServerDisk> ServerDisks { get; set; }
 
     }
 }

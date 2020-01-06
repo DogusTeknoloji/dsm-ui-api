@@ -45,6 +45,7 @@ namespace DSM.UI.Api.Services
 
             var appServer = this._context.ApplicationServers.FirstOrDefault(x => x.ServerName == result.MachineName);
 
+            string noData = "No-Data";
             string comingSoon = "#COMING_SOON#";
             DetailsGeneral dResult = new DetailsGeneral
             {
@@ -57,19 +58,18 @@ namespace DSM.UI.Api.Services
                 SiteCount = siteCount.ToString(),
                 WebServer = appServer?.LicenseVersion,
                 OnlineSiteCount = siteCount == 0 ? "0" : comingSoon,
-                TotalCapacity = comingSoon,
-                PercentFree = comingSoon,
-                LastCheckDate = comingSoon,
-                VolumeDetails = new List<DetailsVolume>
+                TotalCapacity = result.ServerDisks.Count > 0 ? (result.ServerDisks?.Sum(x => x.Capacity)).ToString() + " MB" : noData,
+                PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.FreeSpace) / result.ServerDisks.Sum(x => x.Capacity))).ToString() + " %" : noData,
+                LastCheckDate = DateTime.Today.ToShortDateString(),
+                Volumes = result.ServerDisks.Count > 0 ? string.Join(", ", result.ServerDisks.Select(x => x.DiskName).ToArray()) : noData,
+                VolumeDetails = result.ServerDisks.Select(x => new DetailsVolume
                 {
-                  new DetailsVolume {
-                      VolumeName = comingSoon,
-                      FreePercent = comingSoon,
-                      FreeSpace =comingSoon,
-                      TotalCapacity = comingSoon,
-                      UsedSpace = comingSoon }
-                },
-                Volumes = comingSoon
+                    VolumeName = x.DiskName,
+                    TotalCapacity = (x.Capacity).ToString() + " MB",
+                    FreeSpace = (x.FreeSpace).ToString() + " MB",
+                    UsedSpace = (x.Capacity - x.FreeSpace).ToString() + " MB",
+                    FreePercent = (100 * x.FreeSpace / x.Capacity).ToString() + " %"
+                }).ToList()
             };
             return dResult;
         }

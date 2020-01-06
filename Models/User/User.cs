@@ -24,6 +24,8 @@ namespace DSM.UI.Api.Models.User
         public string AuthKey { get; set; }
         public int? DomainId { get; set; }
         public virtual Domain Domain { get; set; }
+        public string ProfileImage { get; set; }
+
 
         public IMappable<UpdateModel> Map(UpdateModel item)
         {

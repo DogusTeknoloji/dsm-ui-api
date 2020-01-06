@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Drawing;
 
 namespace DSM.UI.Api.Controllers
 {
@@ -33,46 +34,25 @@ namespace DSM.UI.Api.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthenticateModel userParam)
         {
-            // Check username is exist?
-            User user = _userService.GetByUserName(userParam.Username);
+            User user = null;
+            DomainUserHolder holder = LDAPAuthService.ValidateUser(userParam.Username, userParam.Password, this._userService);
 
-            int adDomainId = -1;
-            //if format is valid for LDAP domains.
-            if (Regex.IsMatch(userParam.Username, LDAPAuthService.MAILREGEXPATTERN))
-            {
-                // if exists, use user's previously saved domain info otherwise get all domains to find valid domain.
-                List<Domain> ldapDomains = user == null ? _userService.GetDomainList() : new List<Domain> { user.Domain };
-                //Split by @ and take the second one In Example: username@contoso-domain.com take contoso-domain.com
-                string domainName = userParam.Username.Split('@')[1];
-                //Replace not allowed '-' char to empty literal; So contoso-domain.com -> contosodomain.com
-                domainName = domainName.Replace("-", "");
-                // Split by '.' and take first part of string; So contosodomain.com -> contosodomain
-                domainName = domainName.Split('.')[0];
-                // Create new minified list by which item contains contosodomain in domainlist
-                ldapDomains = ldapDomains.Where(x => x.DomainName.Contains(domainName)).ToList();
-                // Validate user in domains in the list, if found return domain id else return -1
-                adDomainId = LDAPAuthService.AuthenticateActiveDirectory(ldapDomains, userParam.Username, userParam.Password);
-            }
+            DomainUserInfo domainUser = holder?.DomainUser;
 
-            if (adDomainId != -1)
+            if (domainUser != null)
             {
-                int retry = 0;
-                user = _userService.GetByUserName(userParam.Username);
                 // if user is not registered, register first
-                while (user == null && retry < 5)
+                if (holder.User == null)
                 {
-                    RegisterModel model = new RegisterModel
-                    {
-                        Username = userParam.Username,
-                        Password = userParam.Password,
-                        FullName = userParam.Username.Split('@')[0],
-                        DomainId = adDomainId
-                    };
-                    UsersController usersController = this;
-                    var result = usersController.Register(model);
+                    RegisterModel model = MapHelper.Map<RegisterModel, DomainUserInfo>(holder.DomainUser);
+                    _ = this.Register(model);
 
                     user = _userService.GetByUserName(userParam.Username);
-                    retry++;
+                    if (user == null) return StatusCode(500, new { message = "LDAP Register failed." });
+                }
+                else
+                {
+                    user = holder.User;
                 }
             }
             else
@@ -86,36 +66,7 @@ namespace DSM.UI.Api.Controllers
             }
 
             //Continue to login operation...
-
-            Dictionary<string, object> claims = new Dictionary<string, object>
-            {
-                { ClaimTypes.Name, user.FullName },
-                { ClaimTypes.Actor, user.Username },
-                { ClaimTypes.Role, user.Role.Name }
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Username.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role.Name),
-                }),
-                Expires = DateTime.UtcNow.AddHours(6),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Claims = claims,
-                Issuer = "Doğuş Teknoloji",
-                Audience = "DT Users",
-                IssuedAt = DateTime.UtcNow
-            };
-
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-
-            var tokenString = tokenHandler.WriteToken(token);
+            string tokenString = AuthenticationHelper.GetToken(user, _appSettings.Secret);
 
             return Ok(new
             {
@@ -123,9 +74,43 @@ namespace DSM.UI.Api.Controllers
                 user.Username,
                 user.FullName,
                 Role = user.Role?.Name,
-                Token = tokenString
+                Token = tokenString,
+                ProfilePhoto = user.ProfileImage,
+                IsAdUser = domainUser != null
             });
         }
+
+        [AllowAnonymous]
+        [HttpPost("authenticateldap")]
+        public IActionResult AuthenticateLDAP()
+        {
+            User user = null;
+            DomainUserInfo domainUser = LDAPAuthService.GetCurrentUser();
+            if (domainUser == null) return StatusCode(401, new { message = "LDAP Auth failed." });
+            user = this._userService.GetByUserName(domainUser.Username);
+            if (user == null)
+            {
+                RegisterModel model = MapHelper.Map<RegisterModel, DomainUserInfo>(domainUser);
+                _ = this.Register(model);
+
+                user = this._userService.GetByUserName(domainUser.Username);
+                if (user == null) return StatusCode(500, new { message = "LDAP Register failed." });
+            }
+            string tokenString = AuthenticationHelper.GetToken(user, _appSettings.Secret);
+
+            return Ok(new
+            {
+                user.Id,
+                user.Username,
+                domainUser.FullName,
+                Role = user.Role?.Name,
+                Token = tokenString,
+                ProfilePhoto = domainUser.ProfileImage,
+                IsAdUser = domainUser != null
+            });
+        }
+
+
 
         [AllowAnonymous]
         [HttpPost("register")]
