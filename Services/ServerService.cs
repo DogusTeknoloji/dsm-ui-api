@@ -47,6 +47,7 @@ namespace DSM.UI.Api.Services
 
             string noData = "No-Data";
             string comingSoon = "#COMING_SOON#";
+            string numberFormat = "{0:#,#}";
             DetailsGeneral dResult = new DetailsGeneral
             {
                 CPU = result.NumCPU.ToString() + " Core CPU",
@@ -58,17 +59,17 @@ namespace DSM.UI.Api.Services
                 SiteCount = siteCount.ToString(),
                 WebServer = appServer?.LicenseVersion,
                 OnlineSiteCount = siteCount == 0 ? "0" : comingSoon,
-                TotalCapacity = result.ServerDisks.Count > 0 ? (result.ServerDisks?.Sum(x => x.Capacity)).ToString() + " MB" : noData,
-                PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.FreeSpace) / result.ServerDisks.Sum(x => x.Capacity))).ToString() + " %" : noData,
+                TotalCapacity = result.ServerDisks.Count > 0 ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.Capacity))) + " MB" : noData,
+                PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.FreeSpace) / result.ServerDisks.Sum(x => x.Capacity))).ToString() + "% (" + string.Format(numberFormat, result.ServerDisks.Sum(x => x.FreeSpace)) + " MB)" : noData,
                 LastCheckDate = DateTime.Today.ToShortDateString(),
                 Volumes = result.ServerDisks.Count > 0 ? string.Join(", ", result.ServerDisks.Select(x => x.DiskName).ToArray()) : noData,
                 VolumeDetails = result.ServerDisks.Select(x => new DetailsVolume
                 {
                     VolumeName = x.DiskName,
-                    TotalCapacity = (x.Capacity).ToString() + " MB",
-                    FreeSpace = (x.FreeSpace).ToString() + " MB",
-                    UsedSpace = (x.Capacity - x.FreeSpace).ToString() + " MB",
-                    FreePercent = (100 * x.FreeSpace / x.Capacity).ToString() + " %"
+                    TotalCapacity = string.Format(numberFormat, x.Capacity) + " MB",
+                    FreeSpace = string.Format(numberFormat, x.FreeSpace) + " MB",
+                    UsedSpace = string.Format(numberFormat, x.Capacity - x.FreeSpace) + " MB",
+                    FreePercent = string.Format(numberFormat, 100 * x.FreeSpace / x.Capacity) + "%"
                 }).ToList()
             };
             return dResult;
