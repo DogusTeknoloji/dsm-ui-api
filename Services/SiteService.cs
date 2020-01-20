@@ -9,14 +9,14 @@ namespace DSM.UI.Api.Services
 {
     public interface ISiteService
     {
-        IEnumerable<Core.Models.Site> SearchSites(object term);
+        IEnumerable<SearchResult> SearchSites(object term);
         DetailsHeader GetHeader(long id);
         DetailsGeneral GetDetailsGeneral(long id);
         IEnumerable<DetailsBinding> GetDetailsBindings(long id);
         IEnumerable<DetailsPackage> GetDetailsPackages(long id);
         IEnumerable<DetailsBackendServiceConnectionString> GetDetailsConnectionStrings(long id);
         IEnumerable<DetailsBackendServiceEndpoint> GetDetailsEndpoint(long id);
-        IEnumerable<Core.Models.Site> GetSites(int pagenumber);
+        IEnumerable<SearchResult> GetSites(int pagenumber);
         IEnumerable<string> GetLetters();
         IEnumerable<Core.Models.Site> GetSitesByLetter(string letter, int pagenumber);
     }
@@ -150,7 +150,7 @@ namespace DSM.UI.Api.Services
             return header;
         }
 
-        public IEnumerable<Core.Models.Site> SearchSites(object term)
+        public IEnumerable<SearchResult> SearchSites(object term)
         {
             object queryItem = term;
             IEnumerable<PropertyInfo> stringProperties = typeof(Site).GetProperties().Where(prop => prop.PropertyType == term.GetType());
@@ -158,22 +158,58 @@ namespace DSM.UI.Api.Services
             var query = from a in _context.Sites select a;
             query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
 
-            var results = query.ToList();
+            var results = query.ToList().Select(x => new SearchResult
+            {
+                AppPoolName = x.ApplicationPoolName,
+                AppType = x.AppType,
+                IpAddress = x.Bindings.FirstOrDefault()?.IpAddress,
+                HostName = x.Bindings.FirstOrDefault()?.Host,
+                LogFileDirectory = x.LogFileDirectory,
+                Machinename = x.MachineName,
+                PhysicalPath = x.PhysicalPath,
+                Port = x.Bindings.FirstOrDefault()?.Port,
+                SiteId = x.SiteId,
+                SiteName = x.Name
+            }); ;
 
             return results;
         }
 
-        public IEnumerable<Core.Models.Site> GetSites(int pagenumber)
+        public IEnumerable<SearchResult> GetSites(int pagenumber)
         {
             int pageItemCount = 100;
             if (pagenumber < 2)
             {
-                var query = this._context.Sites.Take(pageItemCount);
+                var query = this._context.Sites.Take(pageItemCount).Select(x => new SearchResult
+                {
+                    AppPoolName = x.ApplicationPoolName,
+                    AppType = x.AppType,
+                    IpAddress = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().IpAddress,
+                    HostName = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().Host,
+                    LogFileDirectory = x.LogFileDirectory,
+                    Machinename = x.MachineName,
+                    PhysicalPath = x.PhysicalPath,
+                    Port = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().Port,
+                    SiteId = x.SiteId,
+                    SiteName = x.Name
+                });
                 return query;
             }
             else
             {
-                var query = this._context.Sites.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount);
+                var query = this._context.Sites.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
+                {
+                    AppPoolName = x.ApplicationPoolName,
+                    AppType = x.AppType,
+                    IpAddress = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().IpAddress,
+                    HostName = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().Host,
+                    LogFileDirectory = x.LogFileDirectory,
+                    Machinename = x.MachineName,
+                    PhysicalPath = x.PhysicalPath,
+                    Port = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().Port,
+                    SiteId = x.SiteId,
+                    SiteName = x.Name
+                });
                 return query;
             }
         }

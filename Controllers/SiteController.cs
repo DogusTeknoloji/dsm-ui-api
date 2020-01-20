@@ -28,8 +28,7 @@ namespace DSM.UI.Api.Controllers
             if (searchResults == null)
                 return this.BadRequest(new { message = "Invalid search term" });
 
-            var model = MapHelper.Map<SearchResult, Core.Models.Site>(searchResults);
-            return Ok(model);
+            return Ok(searchResults);
         }
 
         [HttpGet("header/{id}")]
@@ -98,9 +97,7 @@ namespace DSM.UI.Api.Controllers
             var siteInfo = _siteService.GetSites(pageNumber);
             if (siteInfo == null) return BadRequest(InvalidOperationError.GetInstance());
 
-            var model = MapHelper.Map<SearchResult, Core.Models.Site>(siteInfo);
-
-            return Ok(model);
+            return Ok(siteInfo);
         }
         [HttpGet("letters")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
