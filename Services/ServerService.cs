@@ -61,7 +61,7 @@ namespace DSM.UI.Api.Services
                 OnlineSiteCount = siteCount == 0 ? "0" : comingSoon,
                 TotalCapacity = result.ServerDisks.Count > 0 ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.Capacity))) + " MB" : noData,
                 PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.FreeSpace) / result.ServerDisks.Sum(x => x.Capacity))).ToString() + "% (" + string.Format(numberFormat, result.ServerDisks.Sum(x => x.FreeSpace)) + " MB)" : noData,
-                LastCheckDate = DateTime.Today.ToShortDateString(),
+                LastCheckDate = result.ServerDisks.FirstOrDefault()?.CheckDate.ToString(),
                 Volumes = result.ServerDisks.Count > 0 ? string.Join(", ", result.ServerDisks.Select(x => x.DiskName).ToArray()) : noData,
                 VolumeDetails = result.ServerDisks.Select(x => new DetailsVolume
                 {
