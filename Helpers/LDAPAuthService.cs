@@ -46,7 +46,7 @@ namespace DSM.UI.Api.Helpers
                     userInfo.DomainId = domain.DomainId;
                     userInfo.FullName = GetFullname(UserName);
                     userInfo.Username = UserName;
-
+                    userInfo.Password = Password;
                     return userInfo;
                 }
             }
