@@ -178,6 +178,5 @@ namespace DSM.UI.Api
         public DbSet<ApplicationServer> ApplicationServers { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<ServerDisk> ServerDisks { get; set; }
-
     }
 }

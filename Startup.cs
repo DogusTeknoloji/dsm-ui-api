@@ -87,6 +87,7 @@ namespace DSM.UI.Api
             services.AddScoped<ISiteService, SiteService>();
             services.AddScoped<IServerService, ServerService>();
             services.AddScoped<ICompanyService, CompanyService>();
+            services.AddScoped<IReportsService, ReportsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
