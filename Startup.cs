@@ -60,7 +60,7 @@ namespace DSM.UI.Api
                    var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                    var userName = context.Principal.Identity.Name;
                    var user = userService.GetByUserName(userName);
-                   if (user == null)
+                   if (user == null || !user.Enabled)
                    {
                        context.Fail("Unauthorized");
                    }

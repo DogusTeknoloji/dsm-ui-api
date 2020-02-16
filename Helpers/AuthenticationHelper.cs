@@ -41,8 +41,6 @@ namespace DSM.UI.Api.Helpers
 
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-
-
             var tokenString = tokenHandler.WriteToken(token);
 
             return tokenString;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSM.UI.Api.Models.Reports;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,5 +31,6 @@ namespace DSM.UI.Api.Models.Server
         public int CompanyId { get; set; }
         public virtual Company.Company Company { get; set; }
         public virtual List<ServerDisk> ServerDisks { get; set; }
+        public virtual List<ScheduledJobItem> ScheduledJobs { get; set; }
     }
 }

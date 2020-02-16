@@ -57,11 +57,20 @@ namespace DSM.UI.Api.Controllers
             }
             else
             {
+                if (string.IsNullOrEmpty(userParam.Username) || string.IsNullOrEmpty(userParam.Password))
+                {
+                    return BadRequest(new { message = "Password is Required" });
+                }
+
                 user = _userService.Authenticate(userParam.Username, userParam.Password);
 
                 if (user == null)
                 {
                     return BadRequest(new { message = "Username or password is incorrect" });
+                }
+                else if (!user.Enabled)
+                {
+                    return BadRequest(new { message = "This user is disabled." });
                 }
             }
 

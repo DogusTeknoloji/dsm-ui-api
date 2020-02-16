@@ -1,6 +1,7 @@
 ﻿using DSM.Core.Models;
 using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.Company;
+using DSM.UI.Api.Models.Reports;
 using DSM.UI.Api.Models.Server;
 using Microsoft.EntityFrameworkCore;
 
@@ -165,6 +166,12 @@ namespace DSM.UI.Api
                 .HasForeignKey(x => x.ServerId);
             });
 
+            modelBuilder.Entity<ScheduledJobItem>(entity =>
+            {
+                entity.ToTable("JobInventory");
+                entity.HasKey("ObjectName");
+            });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -178,5 +185,6 @@ namespace DSM.UI.Api
         public DbSet<ApplicationServer> ApplicationServers { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<ServerDisk> ServerDisks { get; set; }
+        public DbSet<ScheduledJobItem> ScheduledJobItems { get; set; }
     }
 }

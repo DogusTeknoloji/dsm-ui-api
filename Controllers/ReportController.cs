@@ -27,5 +27,14 @@ namespace DSM.UI.Api.Controllers
             if (reportInfo == null) return this.BadRequest(InvalidOperationError.GetInstance());
             return this.Ok(reportInfo);
         }
+
+        [HttpGet("scheduledjobstatus/{pagenumber}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetScheduledJobStatus(int pagenumber)
+        {
+            var reportInfo = this._reportsService.GetScheduledJobs(pagenumber);
+            if (reportInfo == null) return this.BadRequest(InvalidOperationError.GetInstance());
+            return this.Ok(reportInfo);
+        }
     }
 }

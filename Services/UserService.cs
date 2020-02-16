@@ -31,8 +31,6 @@ namespace DSM.UI.Api.Services
 
         public User Authenticate(string username, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return null;
 
             var user = _context.Users.FirstOrDefault(x => x.Username == username);
 
@@ -58,10 +56,10 @@ namespace DSM.UI.Api.Services
         public User Create(User user, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                throw new AppException("Password is required");
+                return null;
 
             if (_context.Users.Any(x => x.Username == user.Username))
-                throw new AppException("Username \"" + user.Username + "\" is already taken");
+                return null;
 
             user.LastLogin = new DateTime(2000, 01, 01);
             user.LastAttempt = new DateTime(2000, 01, 01);
