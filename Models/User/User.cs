@@ -26,7 +26,7 @@ namespace DSM.UI.Api.Models.User
         public virtual Domain Domain { get; set; }
         public string ProfileImage { get; set; }
 
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
         public IMappable<UpdateModel> Map(UpdateModel item)
         {
             this.Password = item.Password;

@@ -1,6 +1,7 @@
 ﻿using DSM.UI.Api.Models.User;
 using DSM.UI.Api.Services;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
@@ -25,21 +26,14 @@ namespace DSM.UI.Api.Helpers
                 {
                     DirectoryEntry entry = new DirectoryEntry("LDAP://" + domain.DomainName, UserName, Password);
                     if (entry == null) continue;
-                    if (entry.Properties["thumbnailPhoto"] != null)
+
+                    string samAccount = UserName.Split('@')[0];
+                    byte[] imageBytes = GetThumbnailPhoto(samAccount);
+
+                    if (imageBytes != null)
                     {
-                        try
-                        {
-                            object userImage = entry.Properties["thumbnailPhoto"][0];
-                            if (userImage != null)
-                            {
-                                byte[] imageBytes = (byte[])userImage;
-                                string base64String = Convert.ToBase64String(imageBytes);
-                                userInfo.ProfileImage = base64String;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                        }
+                        string base64String = Convert.ToBase64String(imageBytes);
+                        userInfo.ProfileImage = "data:image/png;base64," + base64String;
                     }
 
                     object nativeObject = entry.NativeObject;
@@ -47,6 +41,7 @@ namespace DSM.UI.Api.Helpers
                     userInfo.FullName = GetFullname(UserName);
                     userInfo.Username = UserName;
                     userInfo.Password = Password;
+
                     return userInfo;
                 }
             }
@@ -77,8 +72,8 @@ namespace DSM.UI.Api.Helpers
                 if (de.Properties["thumbnailPhoto"] == null) return userInfo;
                 try
                 {
+                    byte[] userImage = de.Properties["thumbnailPhoto"].Value as byte[];
 
-                    object userImage = de.Properties["thumbnailPhoto"][0];
                     if (userImage != null)
                     {
                         byte[] imageBytes = (byte[])userImage;
@@ -124,5 +119,33 @@ namespace DSM.UI.Api.Helpers
         {
             return username.Split('@')[0];
         }
+        public static byte[] GetThumbnailPhoto(string userName)
+        {
+            using (PrincipalContext principalContext = new PrincipalContext(ContextType.Domain))
+            {
+                using (UserPrincipal userPrincipal = new UserPrincipal(principalContext))
+                {
+                    userPrincipal.SamAccountName = userName;
+                    using (PrincipalSearcher principalSearcher = new PrincipalSearcher())
+                    {
+                        principalSearcher.QueryFilter = userPrincipal;
+                        Principal principal = principalSearcher.FindOne();
+                        if (principal != null)
+                        {
+                            DirectoryEntry directoryEntry = (DirectoryEntry)principal.GetUnderlyingObject();
+                            PropertyValueCollection collection = directoryEntry.Properties["thumbnailPhoto"];
+
+                            if (collection.Value != null && collection.Value is byte[])
+                            {
+                                byte[] thumbnailInBytes = (byte[])collection.Value;
+                                return thumbnailInBytes;
+                            }
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
     }
 }
