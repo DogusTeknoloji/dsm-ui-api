@@ -16,7 +16,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<SearchResult> GetServers(int pagenumber);
         IEnumerable<string> GetLetters();
         IEnumerable<SearchResult> GetServersByLetter(string letter, int pagenumber);
-
+        byte[] DownloadServers(object term = null);
     }
 
     public class ServerService : IServerService
@@ -206,5 +206,43 @@ namespace DSM.UI.Api.Services
                 ServerId = x.Id
             });
         }
+
+        public byte[] DownloadServers(object term = null)
+        {
+            IEnumerable<SearchResult> results = null;
+         if (term==null)
+            {
+                var query = this._context.Servers;
+                results = query.ToList().Select(x => new SearchResult()
+                {
+                    ServerId = x.Id,
+                    CompanyName = x.Company.Name,
+                    DnsName = x.DnsName,
+                    IpAddress = x.IpAddress,
+                    MachineName = x.MachineName,
+                    OperatingSystem = x.OperatingSystem,
+                    Responsible = x.Responsible
+                });
+            }
+            else
+            {
+                IEnumerable<PropertyInfo> stringProperties = typeof(Server).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+
+                var query = from a in _context.Servers select a;
+                query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
+
+                results = query.ToList().Select(x => new SearchResult
+                {
+                    CompanyName = x.Company.Name,
+                    DnsName = x.DnsName,
+                    IpAddress = x.IpAddress,
+                    MachineName = x.MachineName,
+                    OperatingSystem = x.OperatingSystem,
+                    Responsible = x.Responsible,
+                    ServerId = x.Id
+                });
+            }
+            return ExcelOperations.ExportToExcel(results);
+           }
     }
 }

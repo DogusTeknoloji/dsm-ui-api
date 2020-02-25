@@ -19,6 +19,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<SearchResult> GetSites(int pagenumber);
         IEnumerable<string> GetLetters();
         IEnumerable<Core.Models.Site> GetSitesByLetter(string letter, int pagenumber);
+        byte[] DownloadSites(object term = null);
     }
     public class SiteService : ISiteService
     {
@@ -170,7 +171,7 @@ namespace DSM.UI.Api.Services
                 Port = x.Bindings.FirstOrDefault()?.Port,
                 SiteId = x.SiteId,
                 SiteName = x.Name
-            }); ;
+            });
 
             return results;
         }
@@ -236,6 +237,52 @@ namespace DSM.UI.Api.Services
                 var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount);
                 return query;
             }
+        }
+
+        public byte[] DownloadSites(object term = null)
+        {
+            IEnumerable<SearchResult> results = null;
+            object queryItem = term;
+            if (term == null)
+            {
+                var query = this._context.Sites;
+                results = query.ToList().Select(x => new SearchResult
+                {
+                    AppPoolName = x.ApplicationPoolName,
+                    AppType = x.AppType,
+                    IpAddress = x.Bindings.FirstOrDefault()?.IpAddress,
+                    HostName = x.Bindings.FirstOrDefault()?.Host,
+                    LogFileDirectory = x.LogFileDirectory,
+                    Machinename = x.MachineName,
+                    PhysicalPath = x.PhysicalPath,
+                    Port = x.Bindings.FirstOrDefault()?.Port,
+                    SiteId = x.SiteId,
+                    SiteName = x.Name
+                });
+            }
+            else
+            {
+                IEnumerable<PropertyInfo> stringProperties = typeof(Site).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+
+                var query = from a in _context.Sites select a;
+                query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
+
+                results = query.ToList().Select(x => new SearchResult
+                {
+                    AppPoolName = x.ApplicationPoolName,
+                    AppType = x.AppType,
+                    IpAddress = x.Bindings.FirstOrDefault()?.IpAddress,
+                    HostName = x.Bindings.FirstOrDefault()?.Host,
+                    LogFileDirectory = x.LogFileDirectory,
+                    Machinename = x.MachineName,
+                    PhysicalPath = x.PhysicalPath,
+                    Port = x.Bindings.FirstOrDefault()?.Port,
+                    SiteId = x.SiteId,
+                    SiteName = x.Name
+                });
+            }
+
+            return ExcelOperations.ExportToExcel(results);
         }
     }
 }

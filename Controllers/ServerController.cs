@@ -3,6 +3,7 @@ using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System;
 
 namespace DSM.UI.Api.Controllers
 {
@@ -74,6 +75,44 @@ namespace DSM.UI.Api.Controllers
             var siteInfo = this._serverService.GetDetailsSites(id);
             if (siteInfo == null) return BadRequest(InvalidOperationError.GetInstance());
             return Ok(siteInfo);
+        }
+
+        [HttpGet("export/{term}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportServers(string term)
+        {
+            var exportData = this._serverService.DownloadServers(term);
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_SERVERS_{0}.xlsx", date),
+                Inline = false,
+            };
+
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
+        }
+
+        [HttpGet("export/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportServers()
+        {
+            var exportData = this._serverService.DownloadServers();
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_SERVERS_{0}.xlsx", date),
+                Inline = false,
+            };
+
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
         }
     }
 }

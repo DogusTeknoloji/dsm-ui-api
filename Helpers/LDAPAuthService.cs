@@ -69,20 +69,13 @@ namespace DSM.UI.Api.Helpers
 
                 DirectoryEntry de = user.GetUnderlyingObject() as DirectoryEntry;
                 if (de == null) return userInfo;
-                if (de.Properties["thumbnailPhoto"] == null) return userInfo;
-                try
-                {
-                    byte[] userImage = de.Properties["thumbnailPhoto"].Value as byte[];
+                string samAccount = user.EmailAddress.Split('@')[0];
+                byte[] imageBytes = GetThumbnailPhoto(samAccount);
 
-                    if (userImage != null)
-                    {
-                        byte[] imageBytes = (byte[])userImage;
-                        string base64String = Convert.ToBase64String(imageBytes);
-                        userInfo.ProfileImage = base64String;
-                    }
-                }
-                catch (Exception)
+                if (imageBytes != null)
                 {
+                    string base64String = Convert.ToBase64String(imageBytes);
+                    userInfo.ProfileImage = "data:image/png;base64," + base64String;
                 }
             }
             return userInfo;

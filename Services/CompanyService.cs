@@ -16,6 +16,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<string> GetLetters();
         IEnumerable<SearchResult> GetCompanyByLetter(string letter, int pagenumber);
         IEnumerable<SearchResult> GetCompanies(int pagenumber);
+        byte[] DownloadCompanies(object term = null);
     }
     public class CompanyService : ICompanyService
     {
@@ -148,6 +149,27 @@ namespace DSM.UI.Api.Services
                 CompanyId = x.CompanyId,
                 Name = x.Name
             });
+        }
+
+        public byte[] DownloadCompanies(object term = null)
+        {
+
+            IEnumerable<SearchResult> results = null;
+            if (term == null)
+            {
+                var query = this._context.Companies;
+                results = query.ToList().Select(x => new SearchResult { CompanyId = x.CompanyId, Name = x.Name });
+            }
+            else
+            {
+                IEnumerable<PropertyInfo> stringProperties = typeof(Company).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+
+                var query = from a in _context.Companies select a;
+                query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
+                results = query.ToList().Select(x => new SearchResult { CompanyId = x.CompanyId, Name = x.Name });
+            }
+
+            return ExcelOperations.ExportToExcel(results);
         }
     }
 }
