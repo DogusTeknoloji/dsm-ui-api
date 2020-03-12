@@ -1,4 +1,5 @@
 ﻿using DSM.UI.Api.Helpers;
+using DSM.UI.Api.Helpers.RemoteDesktop;
 using DSM.UI.Api.Models.User;
 using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,7 @@ namespace DSM.UI.Api.Controllers
         public IActionResult Authenticate([FromBody]AuthenticateModel userParam)
         {
             User user = null;
+
             DomainUserHolder holder = LDAPAuthService.ValidateUser(userParam.Username, userParam.Password, this._userService);
 
             DomainUserInfo domainUser = holder?.DomainUser;
@@ -111,8 +113,6 @@ namespace DSM.UI.Api.Controllers
             });
         }
 
-
-
         [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody]RegisterModel model)
@@ -130,7 +130,6 @@ namespace DSM.UI.Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
 
         [HttpGet]
         [Authorize(Roles = "Manager, Administrator, CIFANG")]

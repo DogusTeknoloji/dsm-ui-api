@@ -1,4 +1,6 @@
 ﻿using DSM.UI.Api.Helpers;
+using DSM.UI.Api.Helpers.RemoteDesktop;
+using DSM.UI.Api.Helpers.RemoteDesktop.Models;
 using DSM.UI.Api.Models.Server;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<string> GetLetters();
         IEnumerable<SearchResult> GetServersByLetter(string letter, int pagenumber);
         byte[] DownloadServers(object term = null);
+        byte[] DownloadRDPFile(RdpInfo rdpInfo);
     }
 
     public class ServerService : IServerService
@@ -210,7 +213,7 @@ namespace DSM.UI.Api.Services
         public byte[] DownloadServers(object term = null)
         {
             IEnumerable<SearchResult> results = null;
-         if (term==null)
+            if (term == null)
             {
                 var query = this._context.Servers;
                 results = query.ToList().Select(x => new SearchResult()
@@ -243,6 +246,21 @@ namespace DSM.UI.Api.Services
                 });
             }
             return ExcelOperations.ExportToExcel(results);
-           }
+        }
+
+        public byte[] DownloadRDPFile(RdpInfo rdpInfo)
+        {
+            string ipAddress = this._context.Servers
+                .Where(x => x.Id == rdpInfo.ServerId)
+                .Select(x => x.IpAddress)
+                .FirstOrDefault();
+
+            if (string.IsNullOrEmpty(ipAddress)) return null;
+
+            RDPManager.rdpLoginInfo.IpAddress = ipAddress;
+            RDPManager.rdpLoginInfo.Username = rdpInfo.UserName;
+            byte[] result = RDPManager.CreateFile(RDPManager.rdpLoginInfo);
+            return result;
+        }
     }
 }

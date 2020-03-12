@@ -1,4 +1,5 @@
 ﻿using DSM.UI.Api.Helpers;
+using DSM.UI.Api.Helpers.RemoteDesktop.Models;
 using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -113,6 +114,23 @@ namespace DSM.UI.Api.Controllers
 
             Response.Headers.Add("Content-Disposition", cd.ToString());
             return File(exportData, "application/octet-stream");
+        }
+
+        [HttpPost("connect/")]
+        [Authorize(Roles = "Manager, Administrator, CIFANG")]
+        public IActionResult ConnectServer([FromBody] RdpInfo rdpInfo)
+        {
+            var rdpFile = this._serverService.DownloadRDPFile(rdpInfo);
+            if (rdpFile == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = "connection.rdp",
+                Inline = false
+            };
+
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(rdpFile, "application/octet-stream");
         }
     }
 }
