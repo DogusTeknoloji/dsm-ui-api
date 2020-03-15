@@ -30,16 +30,16 @@ namespace DSM.UI.Api.Services
             Company result = this._context.Companies.Find(id);
             var query = from server in result.Servers
                         join appServer in this._context.ApplicationServers
-                        on server.MachineName.ToUpper() equals appServer.ServerName.ToUpper() into leftjoinq
+                        on server.ServerName.ToUpper() equals appServer.ServerName.ToUpper() into leftjoinq
                         from jObj in leftjoinq.DefaultIfEmpty()
                         select new DetailsServers
                         {
-                            ServerId = server.Id,
+                            ServerId = server.ServerId,
                             ApplicationType = jObj?.ApplicationName ?? "Unknown",
-                            ServerName = server.MachineName,
+                            ServerName = server.ServerName,
                             Contact = server.Responsible,
                             Environments = jObj?.Environment ?? "Unknown",
-                            FullName = server.DnsName,
+                            FullName = server.HostName,
                             IpAddress = server.IpAddress,
                             LastBackupDate = server.LastBackup.ToString(),
                             OperatingSystem = server.OperatingSystem,
@@ -53,17 +53,17 @@ namespace DSM.UI.Api.Services
             Company result = this._context.Companies.Find(id);
             var query = from server in result.Servers
                         join site in this._context.Sites
-                        on server.MachineName.ToUpper() equals site.MachineName.ToUpper()
+                        on server.ServerName.ToUpper() equals site.MachineName.ToUpper()
                         select new DetailsSites
                         {
                             SiteId = site.SiteId,
                             PhysicalPath = site.PhysicalPath,
                             SiteName = site.Name,
-                            ServerName = server.MachineName,
-                            DnsName = server.DnsName,
+                            ServerName = server.ServerName,
+                            DnsName = server.HostName,
                             State = site.State,
                             AppType = site.AppType,
-                            Domains = server.MachineName
+                            Domains = server.HostName
                         };
             return query.Distinct(DetailsSiteComparer.Instance);
         }

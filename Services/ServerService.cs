@@ -31,12 +31,12 @@ namespace DSM.UI.Api.Services
         }
         public DetailsGeneral GetDetailsGeneral(int id)
         {
-            Server result = this._context.Servers.Find(id);
+            Server result = this._context.Servers.FirstOrDefault(x => x.ServerId == id);
 
             if (result == null) return null;
 
             int siteCount = 0;
-            var siteCountQuery = this._context.Sites.Where(x => x.MachineName == result.MachineName);
+            var siteCountQuery = this._context.Sites.Where(x => x.MachineName == result.ServerName);
             try
             {
                 if (siteCountQuery.FirstOrDefault() != null) siteCount = siteCountQuery.Count();
@@ -46,33 +46,38 @@ namespace DSM.UI.Api.Services
                 siteCount = 0;
             }
 
-            var appServer = this._context.ApplicationServers.FirstOrDefault(x => x.ServerName == result.MachineName);
 
             string noData = "No-Data";
             string comingSoon = "#COMING_SOON#";
             string numberFormat = "{0:#,#}";
             DetailsGeneral dResult = new DetailsGeneral
             {
-                CPU = result.NumCPU.ToString() + " Core CPU",
-                Domain = result.DnsName,
+                CPU = result.TotalCPU.ToString() + " Core CPU",
+                Domain = result.HostName,
                 IpAddress = result.IpAddress,
-                LastBackup = result.LastBackup.ToString(),
-                Memory = result.MemoryGB.ToString() + " GB",
+                LastBackup = result.LastBackup == null ? "No-Backup" : result.LastBackup.ToString(),
+                Memory = result.TotalMemory.ToString() + " GB",
                 OperatingSystem = result.OperatingSystem,
                 SiteCount = siteCount.ToString(),
-                WebServer = appServer?.LicenseVersion,
+                Boottime = result.Boottime.ToString(),
+                CustomIp = result.CustomIp,
+                MemoryUsage = result.MemoryUsage.ToString(),
+                Notes = result.Notes,
+                PhysicalLocation = result.PhysicalLocation,
+                Responsible = result.Responsible,
+                ServerType = result.ServerType,
+                ToolsRunningStatus = result.ToolsRunningStatus,
                 OnlineSiteCount = siteCount == 0 ? "0" : comingSoon,
-                TotalCapacity = result.ServerDisks.Count > 0 ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.Capacity))) + " MB" : noData,
-                PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.FreeSpace) / result.ServerDisks.Sum(x => x.Capacity))).ToString() + "% (" + string.Format(numberFormat, result.ServerDisks.Sum(x => x.FreeSpace)) + " MB)" : noData,
-                LastCheckDate = result.ServerDisks.FirstOrDefault()?.CheckDate.ToString(),
+                TotalCapacity = result.ServerDisks.Count > 0 ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.DiskCapacity))) + " MB" : noData,
+                PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.DiskFreeSpace) / result.ServerDisks.Sum(x => x.DiskCapacity))).ToString() + "% (" + string.Format(numberFormat, result.ServerDisks.Sum(x => x.DiskFreeSpace)) + " MB)" : noData,
                 Volumes = result.ServerDisks.Count > 0 ? string.Join(", ", result.ServerDisks.Select(x => x.DiskName).ToArray()) : noData,
                 VolumeDetails = result.ServerDisks.Select(x => new DetailsVolume
                 {
                     VolumeName = x.DiskName,
-                    TotalCapacity = string.Format(numberFormat, x.Capacity) + " MB",
-                    FreeSpace = string.Format(numberFormat, x.FreeSpace) + " MB",
-                    UsedSpace = string.Format(numberFormat, x.Capacity - x.FreeSpace) + " MB",
-                    FreePercent = string.Format(numberFormat, 100 * x.FreeSpace / x.Capacity) + "%"
+                    TotalCapacity = string.Format(numberFormat, x.DiskCapacity) + " MB",
+                    FreeSpace = string.Format(numberFormat, x.DiskFreeSpace) + " MB",
+                    UsedSpace = string.Format(numberFormat, x.DiskCapacity - x.DiskFreeSpace) + " MB",
+                    FreePercent = string.Format(numberFormat, 100 * x.DiskFreeSpace / x.DiskCapacity) + "%"
                 }).ToList()
             };
             return dResult;
@@ -83,14 +88,14 @@ namespace DSM.UI.Api.Services
             Server serverX = this._context.Servers.Find(id);
             if (serverX == null) return null;
             var query = from site in _context.Sites
-                        join server in _context.Servers on site.MachineName equals server.MachineName
-                        where site.MachineName == serverX.MachineName
+                        join server in _context.Servers on site.MachineName equals server.ServerName
+                        where site.MachineName == serverX.ServerName
                         select new DetailsSites
                         {
                             SiteId = site.SiteId,
                             SiteName = site.Name,
                             State = site.State,
-                            Domains = server.DnsName,
+                            Domains = server.HostName,
                             PhysicalPath = site.PhysicalPath,
                             AppType = site.AppType
                         };
@@ -100,12 +105,12 @@ namespace DSM.UI.Api.Services
 
         public DetailsHeader GetHeader(int id)
         {
-            Server server = this._context.Servers.SingleOrDefault(x => x.Id == id);
+            Server server = this._context.Servers.SingleOrDefault(x => x.ServerId == id);
             if (server == null) return null;
             return new DetailsHeader
             {
-                ServerId = server.Id,
-                ServerName = server.MachineName,
+                ServerId = server.ServerId,
+                ServerName = server.ServerName,
                 Availability = "Available",
                 CompanyName = server.Company.Name,
                 CompanyId = server.Company.CompanyId
@@ -114,7 +119,7 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<string> GetLetters()
         {
-            var firstLetters = this._context.Servers.GroupBy(s => s.MachineName.Substring(0, 1)).Select(x => x.Key.ToUpper()).ToList();
+            var firstLetters = this._context.Servers.GroupBy(s => s.ServerName.Substring(0, 1)).Select(x => x.Key.ToUpper()).ToList();
             firstLetters = firstLetters.OrderBy(x => x).ToList();
             firstLetters.Add("Tümü");
             return firstLetters;
@@ -127,11 +132,11 @@ namespace DSM.UI.Api.Services
             {
                 var query = this._context.Servers.Take(pageItemCount).Select(x => new SearchResult()
                 {
-                    ServerId = x.Id,
+                    ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
-                    DnsName = x.DnsName,
+                    DnsName = x.HostName,
                     IpAddress = x.IpAddress,
-                    MachineName = x.MachineName,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible
                 });
@@ -141,11 +146,11 @@ namespace DSM.UI.Api.Services
             {
                 var query = this._context.Servers.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
                 {
-                    ServerId = x.Id,
+                    ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
-                    DnsName = x.DnsName,
+                    DnsName = x.HostName,
                     IpAddress = x.IpAddress,
-                    MachineName = x.MachineName,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible
                 });
@@ -156,17 +161,17 @@ namespace DSM.UI.Api.Services
         public IEnumerable<SearchResult> GetServersByLetter(string letter, int pagenumber)
         {
             int pageItemCount = 100;
-            var records = this._context.Servers.Where(x => x.MachineName.StartsWith(letter));
+            var records = this._context.Servers.Where(x => x.ServerName.StartsWith(letter));
 
             if (pagenumber < 2)
             {
                 var query = records.Take(pageItemCount).Select(x => new SearchResult()
                 {
-                    ServerId = x.Id,
+                    ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
-                    DnsName = x.DnsName,
+                    DnsName = x.HostName,
                     IpAddress = x.IpAddress,
-                    MachineName = x.MachineName,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible
                 });
@@ -176,11 +181,11 @@ namespace DSM.UI.Api.Services
             {
                 var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
                 {
-                    ServerId = x.Id,
+                    ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
-                    DnsName = x.DnsName,
+                    DnsName = x.HostName,
                     IpAddress = x.IpAddress,
-                    MachineName = x.MachineName,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible
                 }); ;
@@ -201,12 +206,12 @@ namespace DSM.UI.Api.Services
             return results.Select(x => new SearchResult
             {
                 CompanyName = x.Company.Name,
-                DnsName = x.DnsName,
+                DnsName = x.HostName,
                 IpAddress = x.IpAddress,
-                MachineName = x.MachineName,
+                MachineName = x.ServerName,
                 OperatingSystem = x.OperatingSystem,
                 Responsible = x.Responsible,
-                ServerId = x.Id
+                ServerId = x.ServerId
             });
         }
 
@@ -218,11 +223,11 @@ namespace DSM.UI.Api.Services
                 var query = this._context.Servers;
                 results = query.ToList().Select(x => new SearchResult()
                 {
-                    ServerId = x.Id,
+                    ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
-                    DnsName = x.DnsName,
+                    DnsName = x.HostName,
                     IpAddress = x.IpAddress,
-                    MachineName = x.MachineName,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible
                 });
@@ -237,12 +242,12 @@ namespace DSM.UI.Api.Services
                 results = query.ToList().Select(x => new SearchResult
                 {
                     CompanyName = x.Company.Name,
-                    DnsName = x.DnsName,
+                    DnsName = x.HostName,
                     IpAddress = x.IpAddress,
-                    MachineName = x.MachineName,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible,
-                    ServerId = x.Id
+                    ServerId = x.ServerId
                 });
             }
             return ExcelOperations.ExportToExcel(results);
@@ -251,7 +256,7 @@ namespace DSM.UI.Api.Services
         public byte[] DownloadRDPFile(RdpInfo rdpInfo)
         {
             string ipAddress = this._context.Servers
-                .Where(x => x.Id == rdpInfo.ServerId)
+                .Where(x => x.ServerId == rdpInfo.ServerId)
                 .Select(x => x.IpAddress)
                 .FirstOrDefault();
 

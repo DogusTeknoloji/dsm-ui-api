@@ -134,13 +134,13 @@ namespace DSM.UI.Api.Services
             var query = _context.Sites.SingleOrDefault(x => x.SiteId == id);
             if (query == null) return null;
 
-            var companyQuery = _context.Servers.FirstOrDefault(x => x.MachineName == query.MachineName);
+            var companyQuery = _context.Servers.FirstOrDefault(x => x.ServerName == query.MachineName);
             if (companyQuery == null) return null;
 
             DetailsHeader header = new DetailsHeader
             {
                 SiteName = query.Name,
-                MachineId = companyQuery?.Id,
+                MachineId = companyQuery?.ServerId,
                 MachineName = query.MachineName,
                 Availability = query.IsAvailable ? "Available" : "Not Available",
                 LastUpdated = CalculateTime(query.LastUpdated) + " ago",

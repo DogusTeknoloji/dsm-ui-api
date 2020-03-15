@@ -9,11 +9,9 @@ namespace DSM.UI.Api.Models.Server
     {
         public long DiskId { get; set; }
         public string DiskName { get; set; }
-        public int? Capacity { get; set; }
-        public int? FreeSpace { get; set; }
-        public string LastBackup { get; set; }
+        public int? DiskCapacity { get; set; }
+        public int? DiskFreeSpace { get; set; }
         public int ServerId { get; set; }
-        public DateTime? CheckDate { get; set; }
         public virtual Server Server { get; set; }
     }
 }

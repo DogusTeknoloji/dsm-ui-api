@@ -30,20 +30,19 @@ namespace DSM.UI.Api.Services
             if (pagenumber < 2)
             {
                 var query = this._context.ServerDisks
-                    .OrderBy(x => 100 * x.FreeSpace / (float)x.Capacity)
-                    .ThenBy(x => x.Server.MachineName)
+                    .OrderBy(x => 100 * x.DiskFreeSpace / (float)x.DiskCapacity)
+                    .ThenBy(x => x.Server.ServerName)
                     .Take(_pageItemCount)
                     .Select(x => new OverallDiskStatusItem
                     {
                         CompanyName = x.Server.Company.Name,
-                        ServerId = x.Server.Id,
-                        ServerName = x.Server.MachineName,
+                        ServerId = x.Server.ServerId,
+                        ServerName = x.Server.ServerName,
                         VolumeName = x.DiskName,
-                        DiskCapacity = string.Format(_numberFormat, x.Capacity) + " MB",
-                        FreeDiskSpace = x.FreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.FreeSpace / (float)x.Capacity) + ")",
-                        FreePercentage = 100 * x.FreeSpace / x.Capacity,
-                        LastCheckDate = x.CheckDate,
-                        UsedDiskSpace = string.Format(_numberFormat, x.Capacity - x.FreeSpace) + " MB",
+                        DiskCapacity = string.Format(_numberFormat, x.DiskCapacity) + " MB",
+                        FreeDiskSpace = x.DiskFreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.DiskFreeSpace / (float)x.DiskCapacity) + ")",
+                        FreePercentage = 100 * x.DiskFreeSpace / x.DiskCapacity,
+                        UsedDiskSpace = string.Format(_numberFormat, x.DiskCapacity - x.DiskFreeSpace) + " MB",
                         Responsible = x.Server.Responsible
                     }).AsEnumerable();
                 return query.Distinct();
@@ -51,21 +50,20 @@ namespace DSM.UI.Api.Services
             else
             {
                 var query = this._context.ServerDisks
-                    .OrderBy(x => 100 * x.FreeSpace / (float)x.Capacity)
-                    .ThenBy(x => x.Server.MachineName)
+                    .OrderBy(x => 100 * x.DiskFreeSpace / (float)x.DiskCapacity)
+                    .ThenBy(x => x.Server.ServerName)
                     .Skip((pagenumber - 1) * _pageItemCount)
                     .Take(_pageItemCount)
                     .Select(x => new OverallDiskStatusItem
                     {
                         CompanyName = x.Server.Company.Name,
-                        ServerId = x.Server.Id,
-                        ServerName = x.Server.MachineName,
+                        ServerId = x.Server.ServerId,
+                        ServerName = x.Server.ServerName,
                         VolumeName = x.DiskName,
-                        DiskCapacity = string.Format(_numberFormat, x.Capacity) + " MB",
-                        FreeDiskSpace = x.FreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.FreeSpace / (float)x.Capacity) + ")",
-                        FreePercentage = 100 * x.FreeSpace / x.Capacity,
-                        LastCheckDate = x.CheckDate,
-                        UsedDiskSpace = string.Format(_numberFormat, x.Capacity - x.FreeSpace) + " MB",
+                        DiskCapacity = string.Format(_numberFormat, x.DiskCapacity) + " MB",
+                        FreeDiskSpace = x.DiskFreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.DiskFreeSpace / (float)x.DiskCapacity) + ")",
+                        FreePercentage = 100 * x.DiskFreeSpace / x.DiskCapacity,
+                        UsedDiskSpace = string.Format(_numberFormat, x.DiskCapacity - x.DiskFreeSpace) + " MB",
                         Responsible = x.Server.Responsible
                     }).AsEnumerable();
                 return query.Distinct();
@@ -78,19 +76,18 @@ namespace DSM.UI.Api.Services
             IEnumerable<PropertyInfo> stringProperties = typeof(OverallDiskStatusItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.ServerDisks
-                    .OrderBy(x => 100 * x.FreeSpace / (float)x.Capacity)
-                    .ThenBy(x => x.Server.MachineName)
+                    .OrderBy(x => 100 * x.DiskFreeSpace / (float)x.DiskCapacity)
+                    .ThenBy(x => x.Server.ServerName)
                     .Select(x => new OverallDiskStatusItem
                     {
                         CompanyName = x.Server.Company.Name,
-                        ServerId = x.Server.Id,
-                        ServerName = x.Server.MachineName,
+                        ServerId = x.Server.ServerId,
+                        ServerName = x.Server.ServerName,
                         VolumeName = x.DiskName,
-                        DiskCapacity = string.Format(_numberFormat, x.Capacity) + " MB",
-                        FreeDiskSpace = x.FreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.FreeSpace / (float)x.Capacity) + ")",
-                        FreePercentage = 100 * x.FreeSpace / x.Capacity,
-                        LastCheckDate = x.CheckDate,
-                        UsedDiskSpace = string.Format(_numberFormat, x.Capacity - x.FreeSpace) + " MB",
+                        DiskCapacity = string.Format(_numberFormat, x.DiskCapacity) + " MB",
+                        FreeDiskSpace = x.DiskFreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.DiskFreeSpace / (float)x.DiskCapacity) + ")",
+                        FreePercentage = 100 * x.DiskFreeSpace / x.DiskCapacity,
+                        UsedDiskSpace = string.Format(_numberFormat, x.DiskCapacity - x.DiskFreeSpace) + " MB",
                         Responsible = x.Server.Responsible
                     })
                         select a;
@@ -107,19 +104,18 @@ namespace DSM.UI.Api.Services
             if (term == null)
             {
                 var query = this._context.ServerDisks
-                    .OrderBy(x => 100 * x.FreeSpace / (float)x.Capacity)
-                    .ThenBy(x => x.Server.MachineName)
+                    .OrderBy(x => 100 * x.DiskFreeSpace / (float)x.DiskCapacity)
+                    .ThenBy(x => x.Server.ServerName)
                     .Select(x => new OverallDiskStatusItem
                     {
                         CompanyName = x.Server.Company.Name,
-                        ServerId = x.Server.Id,
-                        ServerName = x.Server.MachineName,
+                        ServerId = x.Server.ServerId,
+                        ServerName = x.Server.ServerName,
                         VolumeName = x.DiskName,
-                        DiskCapacity = string.Format(_numberFormat, x.Capacity) + " MB",
-                        FreeDiskSpace = x.FreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.FreeSpace / (float)x.Capacity) + ")",
-                        FreePercentage = 100 * x.FreeSpace / x.Capacity,
-                        LastCheckDate = x.CheckDate,
-                        UsedDiskSpace = string.Format(_numberFormat, x.Capacity - x.FreeSpace) + " MB",
+                        DiskCapacity = string.Format(_numberFormat, x.DiskCapacity) + " MB",
+                        FreeDiskSpace = x.DiskFreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.DiskFreeSpace / (float)x.DiskCapacity) + ")",
+                        FreePercentage = 100 * x.DiskFreeSpace / x.DiskCapacity,
+                        UsedDiskSpace = string.Format(_numberFormat, x.DiskCapacity - x.DiskFreeSpace) + " MB",
                         Responsible = x.Server.Responsible
                     });
                 results = query.ToList();
@@ -129,19 +125,18 @@ namespace DSM.UI.Api.Services
                 IEnumerable<PropertyInfo> stringProperties = typeof(OverallDiskStatusItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
                 var query = from a in _context.ServerDisks
-                        .OrderBy(x => 100 * x.FreeSpace / (float)x.Capacity)
-                        .ThenBy(x => x.Server.MachineName)
+                        .OrderBy(x => 100 * x.DiskFreeSpace / (float)x.DiskCapacity)
+                        .ThenBy(x => x.Server.ServerName)
                         .Select(x => new OverallDiskStatusItem
                         {
                             CompanyName = x.Server.Company.Name,
-                            ServerId = x.Server.Id,
-                            ServerName = x.Server.MachineName,
+                            ServerId = x.Server.ServerId,
+                            ServerName = x.Server.ServerName,
                             VolumeName = x.DiskName,
-                            DiskCapacity = string.Format(_numberFormat, x.Capacity) + " MB",
-                            FreeDiskSpace = x.FreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.FreeSpace / (float)x.Capacity) + ")",
-                            FreePercentage = 100 * x.FreeSpace / x.Capacity,
-                            LastCheckDate = x.CheckDate,
-                            UsedDiskSpace = string.Format(_numberFormat, x.Capacity - x.FreeSpace) + " MB",
+                            DiskCapacity = string.Format(_numberFormat, x.DiskCapacity) + " MB",
+                            FreeDiskSpace = x.DiskFreeSpace.ToString() + " MB (% " + string.Format("{0:0.##}", 100 * x.DiskFreeSpace / (float)x.DiskCapacity) + ")",
+                            FreePercentage = 100 * x.DiskFreeSpace / x.DiskCapacity,
+                            UsedDiskSpace = string.Format(_numberFormat, x.DiskCapacity - x.DiskFreeSpace) + " MB",
                             Responsible = x.Server.Responsible
                         })
                             select a;
