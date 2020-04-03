@@ -1,6 +1,7 @@
 ﻿using DSM.Core.Models;
 using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.Company;
+using DSM.UI.Api.Models.Dashboard;
 using DSM.UI.Api.Models.Reports;
 using DSM.UI.Api.Models.Server;
 using Microsoft.EntityFrameworkCore;
@@ -172,6 +173,13 @@ namespace DSM.UI.Api
                 entity.HasKey("ObjectName");
             });
 
+
+            modelBuilder.Entity<AppManagementLink>(entity => 
+            {
+                entity.ToTable("AppManagementLinks");
+                entity.HasKey("AppId");
+            });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -186,5 +194,6 @@ namespace DSM.UI.Api
         public DbSet<Server> Servers { get; set; }
         public DbSet<ServerDisk> ServerDisks { get; set; }
         public DbSet<ScheduledJobItem> ScheduledJobItems { get; set; }
+        public DbSet<AppManagementLink> AppManagementLinks { get; set; }
     }
 }
