@@ -4,16 +4,6 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-- task: replacetokens@3
-  inputs:
-    targetFiles: '**/appsettings.json'
-    encoding: 'auto'
-    writeBOM: true
-    actionOnMissing: 'warn'
-    keepToken: false
-    tokenPrefix: '#{'
-    tokenSuffix: '}#'
-
 name: $(Year:yy).$(DayOfYear).$(Rev:rr)
 steps:
 - script: dotnet build --configuration $(build-configuration)
