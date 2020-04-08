@@ -20,6 +20,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<SearchResult> GetServersByLetter(string letter, int pagenumber);
         byte[] DownloadServers(object term = null);
         byte[] DownloadRDPFile(RdpInfo rdpInfo);
+        string GetServerCheckDate();
     }
 
     public class ServerService : IServerService
@@ -46,7 +47,8 @@ namespace DSM.UI.Api.Services
                 siteCount = 0;
             }
 
-
+            string lastCheckDate = this._context.VCenterLogs.Where(x => x.LogName == "DiskStatus").Select(x => x.LogValue).FirstOrDefault();
+            lastCheckDate = Convert.ToDateTime(lastCheckDate).ToString();
             string noData = "No-Data";
             string comingSoon = "#COMING_SOON#";
             string numberFormat = "{0:#,#}";
@@ -71,6 +73,7 @@ namespace DSM.UI.Api.Services
                 TotalCapacity = result.ServerDisks.Count > 0 ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.DiskCapacity))) + " MB" : noData,
                 PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.DiskFreeSpace) / result.ServerDisks.Sum(x => x.DiskCapacity))).ToString() + "% (" + string.Format(numberFormat, result.ServerDisks.Sum(x => x.DiskFreeSpace)) + " MB)" : noData,
                 Volumes = result.ServerDisks.Count > 0 ? string.Join(", ", result.ServerDisks.Select(x => x.DiskName).ToArray()) : noData,
+                LastCheckDate = lastCheckDate,
                 VolumeDetails = result.ServerDisks.Select(x => new DetailsVolume
                 {
                     VolumeName = x.DiskName,
@@ -266,6 +269,14 @@ namespace DSM.UI.Api.Services
             RDPManager.rdpLoginInfo.Username = rdpInfo.UserName;
             byte[] result = RDPManager.CreateFile(RDPManager.rdpLoginInfo);
             return result;
+        }
+
+        public string GetServerCheckDate()
+        {
+            var query = from a in _context.VCenterLogs where a.LogName == "ServerInventory" select a.LogValue;
+            string checkDate = query.FirstOrDefault();
+            checkDate = Convert.ToDateTime(checkDate).ToString();
+            return checkDate;
         }
     }
 }

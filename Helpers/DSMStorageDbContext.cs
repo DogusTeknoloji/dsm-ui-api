@@ -174,10 +174,16 @@ namespace DSM.UI.Api
             });
 
 
-            modelBuilder.Entity<AppManagementLink>(entity => 
+            modelBuilder.Entity<AppManagementLink>(entity =>
             {
                 entity.ToTable("AppManagementLinks");
                 entity.HasKey("AppId");
+            });
+
+            modelBuilder.Entity<VCenterLog>(entity =>
+            {
+                entity.ToTable("VCenterLogs");
+                entity.HasNoKey();
             });
 
             base.OnModelCreating(modelBuilder);
@@ -195,5 +201,6 @@ namespace DSM.UI.Api
         public DbSet<ServerDisk> ServerDisks { get; set; }
         public DbSet<ScheduledJobItem> ScheduledJobItems { get; set; }
         public DbSet<AppManagementLink> AppManagementLinks { get; set; }
+        public DbSet<VCenterLog> VCenterLogs { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace DSM.UI.Api.Services
     public interface IDashboardService
     {
         IEnumerable<AppManagementLink> GetLinks();
+        string GetDashboard();
     }
 
     public class DashboardService : IDashboardService
@@ -17,6 +18,13 @@ namespace DSM.UI.Api.Services
         {
             _context = context;
         }
+
+        public string GetDashboard()
+        {
+            // Blank method for test. It won't be use
+            return "Ok";
+        }
+
         public IEnumerable<AppManagementLink> GetLinks()
         {
             var query = this._context.AppManagementLinks.Where(x => x.IsActive);

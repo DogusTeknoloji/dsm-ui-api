@@ -28,5 +28,13 @@ namespace DSM.UI.Api.Controllers
             if (links == null) return BadRequest(InvalidOperationError.GetInstance());
             return Ok(links.OrderBy(x => x.Description));
         }
+
+        [HttpGet("dashboard")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetDashboard()
+        {
+            var result = this._dashboardService.GetDashboard();
+            return Ok(result);
+        }
     }
 }

@@ -132,5 +132,14 @@ namespace DSM.UI.Api.Controllers
             Response.Headers.Add("Content-Disposition", cd.ToString());
             return File(rdpFile, "application/octet-stream");
         }
+
+        [HttpGet("ServerCheckDate/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetServerCheckDate()
+        {
+            var checkDate = this._serverService.GetServerCheckDate();
+            if (checkDate == null) return NotFound();
+            return Ok(checkDate);
+        }
     }
 }
