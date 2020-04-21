@@ -68,6 +68,7 @@ namespace DSM.UI.Api.Services
                 PhysicalLocation = result.PhysicalLocation,
                 Responsible = result.Responsible,
                 ServerType = result.ServerType,
+                ServiceName = result.ServiceName,
                 ToolsRunningStatus = result.ToolsRunningStatus,
                 OnlineSiteCount = siteCount == 0 ? "0" : comingSoon,
                 TotalCapacity = result.ServerDisks.Count > 0 ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.DiskCapacity))) + " MB" : noData,
@@ -141,7 +142,8 @@ namespace DSM.UI.Api.Services
                     IpAddress = x.IpAddress,
                     MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
-                    Responsible = x.Responsible
+                    Responsible = x.Responsible,
+                    ServiceName = x.ServiceName
                 });
                 return query.Distinct();
             }
@@ -155,7 +157,8 @@ namespace DSM.UI.Api.Services
                     IpAddress = x.IpAddress,
                     MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
-                    Responsible = x.Responsible
+                    Responsible = x.Responsible,
+                    ServiceName = x.ServiceName
                 });
                 return query.Distinct();
             }
@@ -176,7 +179,8 @@ namespace DSM.UI.Api.Services
                     IpAddress = x.IpAddress,
                     MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
-                    Responsible = x.Responsible
+                    Responsible = x.Responsible,
+                    ServiceName = x.ServiceName
                 });
                 return query.Distinct();
             }
@@ -190,8 +194,9 @@ namespace DSM.UI.Api.Services
                     IpAddress = x.IpAddress,
                     MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
-                    Responsible = x.Responsible
-                }); ;
+                    Responsible = x.Responsible,
+                    ServiceName = x.ServiceName
+                });
                 return query.Distinct();
             }
         }
@@ -214,6 +219,7 @@ namespace DSM.UI.Api.Services
                 MachineName = x.ServerName,
                 OperatingSystem = x.OperatingSystem,
                 Responsible = x.Responsible,
+                ServiceName = x.ServiceName,
                 ServerId = x.ServerId
             });
         }

@@ -35,6 +35,8 @@ namespace DSM.UI.Api.Models.Server
         public string Cluster { get; set; }
         public string Notes { get; set; }
         public int CompanyId { get; set; }
+        [Column("Service")]
+        public string ServiceName { get; set; }
         public virtual Company.Company Company { get; set; }
         public virtual List<ServerDisk> ServerDisks { get; set; }
         public virtual List<ScheduledJobItem> ScheduledJobs { get; set; }

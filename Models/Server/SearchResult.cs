@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DSM.UI.Api.Models.Server
+﻿namespace DSM.UI.Api.Models.Server
 {
     public class SearchResult
     {
@@ -14,5 +9,6 @@ namespace DSM.UI.Api.Models.Server
         public string Responsible { get; set; }
         public string DnsName { get; set; }
         public string IpAddress { get; set; }
+        public string ServiceName { get; set; }
     }
 }
