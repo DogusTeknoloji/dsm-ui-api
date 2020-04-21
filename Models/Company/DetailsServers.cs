@@ -14,7 +14,7 @@ namespace DSM.UI.Api.Models.Company
         public string OperatingSystem { get; set; }
         public string Environments { get; set; }
         public string ApplicationType { get; set; }
-        public string Responsible { get; set; }
+        public string Owner { get; set; }
         public string Contact { get; set; }
         public string LastBackupDate { get; set; }
     }

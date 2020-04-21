@@ -40,7 +40,7 @@ namespace DSM.UI.Api.Services
                             IpAddress = server.IpAddress,
                             LastBackupDate = server.LastBackup.ToString(),
                             OperatingSystem = server.OperatingSystem,
-                            Responsible = server.Responsible
+                            Owner = result.Name
                         };
             return query.Distinct(DetailsServerComparer.Instance);
         }
