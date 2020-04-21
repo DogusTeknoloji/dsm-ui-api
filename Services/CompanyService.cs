@@ -29,21 +29,18 @@ namespace DSM.UI.Api.Services
         {
             Company result = this._context.Companies.Find(id);
             var query = from server in result.Servers
-                        join appServer in this._context.ApplicationServers
-                        on server.ServerName.ToUpper() equals appServer.ServerName.ToUpper() into leftjoinq
-                        from jObj in leftjoinq.DefaultIfEmpty()
                         select new DetailsServers
                         {
                             ServerId = server.ServerId,
-                            ApplicationType = jObj?.ApplicationName ?? "Unknown",
+                            ApplicationType = server.ServiceName,
                             ServerName = server.ServerName,
                             Contact = server.Responsible,
-                            Environments = jObj?.Environment ?? "Unknown",
+                            Environments = server.ServerType,
                             FullName = server.HostName,
                             IpAddress = server.IpAddress,
                             LastBackupDate = server.LastBackup.ToString(),
                             OperatingSystem = server.OperatingSystem,
-                            Owner = jObj?.Owner ?? "Unknown"
+                            Responsible = server.Responsible
                         };
             return query.Distinct(DetailsServerComparer.Instance);
         }
