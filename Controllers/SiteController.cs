@@ -93,9 +93,9 @@ namespace DSM.UI.Api.Controllers
         }
         [HttpGet("{pageNumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public IActionResult GetSites(int pageNumber)
+        public IActionResult GetSites(int pageNumber, [FromQuery(Name = "fi")]string fieldName = null, [FromQuery(Name = "pos")]int orderPosition = -1)
         {
-            var siteInfo = _siteService.GetSites(pageNumber);
+            var siteInfo = _siteService.GetSites(pageNumber, fieldName, orderPosition);
             if (siteInfo == null) return BadRequest(InvalidOperationError.GetInstance());
 
             return Ok(siteInfo);

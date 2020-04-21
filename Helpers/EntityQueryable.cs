@@ -2,11 +2,50 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Reflection;
 namespace DSM.UI.Api.Helpers
 {
     public static class EntityQueryable
     {
+
+        public static IQueryable<TEntity> OrderBy<TEntity>(this IQueryable<TEntity> source, string property, bool asc = true) where TEntity : class
+        {
+            //STEP 1: Verify the property is valid
+            var searchProperty = typeof(TEntity).GetProperty(property);
+
+            if (searchProperty == null)
+                throw new ArgumentException("property");
+
+            if (!searchProperty.PropertyType.IsValueType && !searchProperty.PropertyType.IsPrimitive &&
+                !searchProperty.PropertyType.Namespace.StartsWith("System") && !searchProperty.PropertyType.IsEnum)
+            {
+                throw new ArgumentException("property");
+            }
+
+            if (searchProperty.GetMethod == null || !searchProperty.GetMethod.IsPublic)
+            {
+                throw new ArgumentException("property");
+            }
+
+            //STEP 2: Create the OrderBy property selector
+            var parameter = Expression.Parameter(typeof(TEntity), "o");
+            var selectorExpr = Expression.Lambda(Expression.Property(parameter, property), parameter);
+
+            //STEP 3: Update the IQueryable expression to include OrderBy
+            var queryExpr = source.Expression;
+            queryExpr = Expression.Call(
+                typeof(Queryable),
+                asc ? "OrderBy" : "OrderByDescending",
+                new Type[] {
+            source.ElementType,
+            searchProperty.PropertyType },
+                queryExpr,
+                selectorExpr);
+
+            return source.Provider.CreateQuery<TEntity>(queryExpr);
+        }
+
         public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, string field, string value, bool throwExceptionIfNoProperty = false, bool throwExceptionIfNoType = false) where TEntity : class
         {
             PropertyInfo propertyInfo = typeof(TEntity).GetProperty(field);

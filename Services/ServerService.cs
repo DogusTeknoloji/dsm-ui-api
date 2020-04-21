@@ -4,6 +4,7 @@ using DSM.UI.Api.Helpers.RemoteDesktop.Models;
 using DSM.UI.Api.Models.Server;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -15,7 +16,7 @@ namespace DSM.UI.Api.Services
         DetailsHeader GetHeader(int id);
         DetailsGeneral GetDetailsGeneral(int id);
         IEnumerable<DetailsSites> GetDetailsSites(int id);
-        IEnumerable<SearchResult> GetServers(int pagenumber);
+        IEnumerable<SearchResult> GetServers(int pagenumber, string fieldName = null, int orderPosition = -1);
         IEnumerable<string> GetLetters();
         IEnumerable<SearchResult> GetServersByLetter(string letter, int pagenumber);
         byte[] DownloadServers(object term = null);
@@ -129,12 +130,22 @@ namespace DSM.UI.Api.Services
             return firstLetters;
         }
 
-        public IEnumerable<SearchResult> GetServers(int pagenumber)
+        public IEnumerable<SearchResult> GetServers(int pagenumber, string fieldName = null, int orderPosition = -1)
         {
+            var orderQuery = from a in this._context.Servers select a;
+            
+            if (!(fieldName is null) && orderPosition != -1)
+            {
+                PropertyInfo orderColumn = typeof(Server).GetProperties().FirstOrDefault(prop => prop.Name.ToLower(CultureInfo.GetCultureInfo("en-US")) == fieldName.ToLower(CultureInfo.GetCultureInfo("en-US")));
+                if (orderColumn == null) return null;
+                orderQuery = EntityQueryable.OrderBy(orderQuery, orderColumn.Name, orderPosition == 1 ? false : true);
+                orderQuery = orderQuery.AsEnumerable().AsQueryable();
+            }
+
             int pageItemCount = 100;
             if (pagenumber < 2)
             {
-                var query = this._context.Servers.Take(pageItemCount).Select(x => new SearchResult()
+                var query = orderQuery.Take(pageItemCount).Select(x => new SearchResult()
                 {
                     ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
@@ -149,7 +160,7 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = this._context.Servers.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
+                var query = orderQuery.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
                 {
                     ServerId = x.ServerId,
                     CompanyName = x.Company.Name,

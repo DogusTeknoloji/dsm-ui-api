@@ -47,9 +47,9 @@ namespace DSM.UI.Api.Controllers
         }
         [HttpGet("{pagenumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public IActionResult GetServers(int pagenumber)
+        public IActionResult GetServers(int pagenumber, [FromQuery(Name = "fi")]string fieldName = null, [FromQuery(Name = "pos")]int orderPosition = -1)
         {
-            var serverInfo = this._serverService.GetServers(pagenumber);
+            var serverInfo = this._serverService.GetServers(pagenumber, fieldName, orderPosition);
             if (serverInfo == null) return BadRequest(InvalidOperationError.GetInstance());
             return Ok(serverInfo);
         }

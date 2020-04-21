@@ -2,6 +2,7 @@
 using DSM.UI.Api.Models.Site;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -16,7 +17,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<DetailsPackage> GetDetailsPackages(long id);
         IEnumerable<DetailsBackendServiceConnectionString> GetDetailsConnectionStrings(long id);
         IEnumerable<DetailsBackendServiceEndpoint> GetDetailsEndpoint(long id);
-        IEnumerable<SearchResult> GetSites(int pagenumber);
+        IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName = null, int orderPosition = -1);
         IEnumerable<string> GetLetters();
         IEnumerable<Core.Models.Site> GetSitesByLetter(string letter, int pagenumber);
         byte[] DownloadSites(object term = null);
@@ -176,12 +177,22 @@ namespace DSM.UI.Api.Services
             return results;
         }
 
-        public IEnumerable<SearchResult> GetSites(int pagenumber)
+        public IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName = null, int orderPosition = -1)
         {
+            var orderQuery = from a in this._context.Sites select a;
+
+            if (!(fieldName is null) && orderPosition != -1)
+            {
+                PropertyInfo orderColumn = typeof(Site).GetProperties().FirstOrDefault(prop => prop.Name.ToLower(CultureInfo.GetCultureInfo("en-US")) == fieldName.ToLower(CultureInfo.GetCultureInfo("en-US")));
+                if (orderColumn == null) return null;
+                orderQuery = EntityQueryable.OrderBy(orderQuery, orderColumn.Name, orderPosition == 1 ? false : true);
+                orderQuery = orderQuery.AsEnumerable().AsQueryable();
+            }
+
             int pageItemCount = 100;
             if (pagenumber < 2)
             {
-                var query = this._context.Sites.Take(pageItemCount).Select(x => new SearchResult
+                var query = orderQuery.Take(pageItemCount).Select(x => new SearchResult
                 {
                     AppPoolName = x.ApplicationPoolName,
                     AppType = x.AppType,
@@ -198,7 +209,7 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = this._context.Sites.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
+                var query = orderQuery.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
                 {
                     AppPoolName = x.ApplicationPoolName,
                     AppType = x.AppType,
