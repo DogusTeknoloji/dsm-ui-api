@@ -156,7 +156,7 @@ namespace DSM.UI.Api.Services
                     Responsible = x.Responsible,
                     ServiceName = x.ServiceName
                 });
-                return query.Distinct();
+                return query;
             }
             else
             {
@@ -171,7 +171,7 @@ namespace DSM.UI.Api.Services
                     Responsible = x.Responsible,
                     ServiceName = x.ServiceName
                 });
-                return query.Distinct();
+                return query;
             }
         }
 

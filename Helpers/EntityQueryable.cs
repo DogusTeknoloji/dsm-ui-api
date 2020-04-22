@@ -9,41 +9,35 @@ namespace DSM.UI.Api.Helpers
     public static class EntityQueryable
     {
 
-        public static IQueryable<TEntity> OrderBy<TEntity>(this IQueryable<TEntity> source, string property, bool asc = true) where TEntity : class
+        public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering, bool ascending = true)
         {
-            //STEP 1: Verify the property is valid
-            var searchProperty = typeof(TEntity).GetProperty(property);
-
-            if (searchProperty == null)
-                throw new ArgumentException("property");
-
-            if (!searchProperty.PropertyType.IsValueType && !searchProperty.PropertyType.IsPrimitive &&
-                !searchProperty.PropertyType.Namespace.StartsWith("System") && !searchProperty.PropertyType.IsEnum)
+            var type = typeof(T);
+            var parameter = Expression.Parameter(type, "p");
+            PropertyInfo property;
+            Expression propertyAccess;
+            if (ordering.Contains('.'))
             {
-                throw new ArgumentException("property");
+                // support to be sorted on child fields.
+                String[] childProperties = ordering.Split('.');
+                property = type.GetProperty(childProperties[0]);
+                propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                for (int i = 1; i < childProperties.Length; i++)
+                {
+                    property = property.PropertyType.GetProperty(childProperties[i]);
+                    propertyAccess = Expression.MakeMemberAccess(propertyAccess, property);
+                }
             }
-
-            if (searchProperty.GetMethod == null || !searchProperty.GetMethod.IsPublic)
+            else
             {
-                throw new ArgumentException("property");
+                property = typeof(T).GetProperty(ordering);
+                propertyAccess = Expression.MakeMemberAccess(parameter, property);
             }
-
-            //STEP 2: Create the OrderBy property selector
-            var parameter = Expression.Parameter(typeof(TEntity), "o");
-            var selectorExpr = Expression.Lambda(Expression.Property(parameter, property), parameter);
-
-            //STEP 3: Update the IQueryable expression to include OrderBy
-            var queryExpr = source.Expression;
-            queryExpr = Expression.Call(
-                typeof(Queryable),
-                asc ? "OrderBy" : "OrderByDescending",
-                new Type[] {
-            source.ElementType,
-            searchProperty.PropertyType },
-                queryExpr,
-                selectorExpr);
-
-            return source.Provider.CreateQuery<TEntity>(queryExpr);
+            var orderByExp = Expression.Lambda(propertyAccess, parameter);
+            MethodCallExpression resultExp = Expression.Call(typeof(Queryable),
+                                                             ascending ? "OrderBy" : "OrderByDescending",
+                                                             new[] { type, property.PropertyType }, source.Expression,
+                                                             Expression.Quote(orderByExp));
+            return source.Provider.CreateQuery<T>(resultExp);
         }
 
         public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, string field, string value, bool throwExceptionIfNoProperty = false, bool throwExceptionIfNoType = false) where TEntity : class
