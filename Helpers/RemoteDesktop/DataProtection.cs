@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 
 namespace DSM.UI.Api.Helpers.RemoteDesktop
 {
-    [Serializable()]
+    [Serializable]
     public sealed class DataProtection
     {
-        [Flags()]
+        [Flags]
         public enum CryptProtectPromptFlags
         {
             CRYPTPROTECT_PROMPT_ON_UNPROTECT = 0x01,
@@ -18,7 +19,7 @@ namespace DSM.UI.Api.Helpers.RemoteDesktop
             CRYPTPROTECT_PROMPT_REQUIRE_STRONG = 0x10
         }
 
-        [Flags()]
+        [Flags]
         public enum CryptProtectDataFlags
         {
             CRYPTPROTECT_UI_FORBIDDEN = 0x01,
@@ -65,7 +66,7 @@ namespace DSM.UI.Api.Helpers.RemoteDesktop
             din.pbData = Marshal.AllocHGlobal(din.cbData);
 
             if (din.pbData.Equals(IntPtr.Zero))
-                throw new OutOfMemoryException("Unable to allocate memory for buffer.");
+                throw new OverflowException("Unable to allocate memory for buffer.");
 
             Marshal.Copy(data, 0, din.pbData, din.cbData);
 
@@ -107,14 +108,14 @@ namespace DSM.UI.Api.Helpers.RemoteDesktop
         }
     }
 
-    [SuppressUnmanagedCodeSecurityAttribute()]
+    [SuppressUnmanagedCodeSecurity]
     internal class DPAPI
     {
-        [DllImport("crypt32")]
+        [DllImport("crypt32", CharSet = CharSet.Unicode)]
         public static extern bool CryptProtectData(ref DATA_BLOB dataIn, string szDataDescr, IntPtr optionalEntropy, IntPtr pvReserved,
             IntPtr pPromptStruct, DataProtection.CryptProtectDataFlags dwFlags, ref DATA_BLOB pDataOut);
 
-        [DllImport("crypt32")]
+        [DllImport("crypt32", CharSet = CharSet.Unicode)]
         public static extern bool CryptUnprotectData(ref DATA_BLOB dataIn, StringBuilder ppszDataDescr, IntPtr optionalEntropy,
             IntPtr pvReserved, IntPtr pPromptStruct, DataProtection.CryptProtectDataFlags dwFlags, ref DATA_BLOB pDataOut);
 
@@ -122,25 +123,39 @@ namespace DSM.UI.Api.Helpers.RemoteDesktop
         public static extern IntPtr LocalFree(IntPtr hMem);
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct DATA_BLOB
+        public struct DATA_BLOB : IEquatable<DATA_BLOB>
         {
             public int cbData;
             public IntPtr pbData;
+
+            public bool Equals(DATA_BLOB other)
+            {
+                return (this.cbData == other.cbData
+                    && this.pbData == other.pbData);
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct CRYPTPROTECT_PROMPTSTRUCT
+        public struct CRYPTPROTECT_PROMPTSTRUCT : IEquatable<CRYPTPROTECT_PROMPTSTRUCT>
         {
             public int cbSize; // = Marshal.SizeOf(typeof(CRYPTPROTECT_PROMPTSTRUCT))
             public int dwPromptFlags; // = 0
             public IntPtr hwndApp; // = IntPtr.Zero
             public string szPrompt; // = null
+
+            public bool Equals(CRYPTPROTECT_PROMPTSTRUCT other)
+            {
+                return (this.cbSize == other.cbSize
+                    && this.dwPromptFlags == other.dwPromptFlags
+                    && this.hwndApp == other.hwndApp
+                    && this.szPrompt == other.szPrompt);
+            }
         }
     }
 
     internal class Win32Error
     {
-        [Flags()]
+        [Flags]
         public enum FormatMessageFlags : int
         {
             FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x0100,
@@ -152,7 +167,7 @@ namespace DSM.UI.Api.Helpers.RemoteDesktop
             FORMAT_MESSAGE_MAX_WIDTH_MASK = 0xFF,
         }
 
-        [DllImport("Kernel32.dll")]
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern int FormatMessage(FormatMessageFlags flags, IntPtr source, int messageId, int languageId,
             StringBuilder buffer, int size, IntPtr arguments);
     }
