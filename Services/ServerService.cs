@@ -282,9 +282,7 @@ namespace DSM.UI.Api.Services
 
             if (string.IsNullOrEmpty(ipAddress)) return null;
 
-            RDPManager.rdpLoginInfo.IpAddress = ipAddress;
-            RDPManager.rdpLoginInfo.Username = rdpInfo.UserName;
-            byte[] result = RDPManager.CreateFile(RDPManager.rdpLoginInfo);
+            byte[] result = RDPManager.CreateFile(new LoginInfo { Username = rdpInfo.UserName, IpAddress = ipAddress });
             return result;
         }
 
