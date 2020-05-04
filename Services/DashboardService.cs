@@ -13,7 +13,7 @@ namespace DSM.UI.Api.Services
 
     public class DashboardService : IDashboardService
     {
-        private DSMStorageDataContext _context;
+        private readonly DSMStorageDataContext _context;
         public DashboardService(DSMStorageDataContext context)
         {
             _context = context;
