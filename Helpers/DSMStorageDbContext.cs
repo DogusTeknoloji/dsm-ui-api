@@ -173,7 +173,6 @@ namespace DSM.UI.Api
                 entity.HasKey("ObjectName");
             });
 
-
             modelBuilder.Entity<AppManagementLink>(entity =>
             {
                 entity.ToTable("AppManagementLinks");

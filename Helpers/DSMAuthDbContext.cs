@@ -1,20 +1,18 @@
 ﻿using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.User;
+using DSM.UI.Api.Models.WebAccessLogs;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DSM.UI.Api.Helpers
 {
-    public class UserDataContext : DbContext
+    public class DSMAuthDbContext : DbContext
     {
-        public UserDataContext(DbContextOptions<UserDataContext> options) : base(options) { }
+        public DSMAuthDbContext(DbContextOptions<DSMAuthDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Domain> Domains { get; set; }
+        public DbSet<WebAccessLog> WebAccessLogs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(e =>
@@ -41,6 +39,14 @@ namespace DSM.UI.Api.Helpers
             modelBuilder.Entity<Domain>(e =>
             {
                 e.ToTable("Domains");
+            });
+
+            modelBuilder.Entity<WebAccessLog>(entity =>
+            {
+                entity.ToTable("WebAccessLogs");
+                entity.Property(p => p.LogId).ValueGeneratedOnAdd();
+
+                entity.HasKey(x => x.LogId);
             });
 
             base.OnModelCreating(modelBuilder);

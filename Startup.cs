@@ -1,24 +1,25 @@
-using System.Text;
 using DSM.UI.Api.Helpers;
 using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using DSM.UI.Api.Models.User;
-using Microsoft.AspNetCore.Identity;
+using System;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DSM.UI.Api
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -32,7 +33,7 @@ namespace DSM.UI.Api
 
             services.AddCors();
             services.AddControllers();
-            services.AddDbContext<UserDataContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DSMAuthServer")));
+            services.AddDbContext<DSMAuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DSMAuthServer")), ServiceLifetime.Transient);
             services.AddDbContext<DSMStorageDataContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DSMStorageServer")));
 
             // Configure Settings object
@@ -89,6 +90,7 @@ namespace DSM.UI.Api
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IReportsService, ReportsService>();
             services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IWebAccessLogService, WebAccessLogService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -96,7 +98,8 @@ namespace DSM.UI.Api
         {
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-
+            // Import custom web access log midleware
+            app.UseWebAccessLog();
 
             if (env.IsDevelopment())
             {

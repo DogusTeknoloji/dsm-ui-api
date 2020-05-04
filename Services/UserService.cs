@@ -21,13 +21,11 @@ namespace DSM.UI.Api.Services
     }
     public class UserService : IUserService
     {
-        private UserDataContext _context;
+        private DSMAuthDbContext _context;
 
-        public UserService(UserDataContext context)
+        public UserService(DSMAuthDbContext context)
         {
             _context = context;
-            context.Database.EnsureCreated();
-
         }
 
         public User Authenticate(string username, string password)

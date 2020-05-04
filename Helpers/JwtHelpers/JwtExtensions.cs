@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using DSM.UI.Api.Models.User;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DSM.UI.Api.Helpers.JwtHelpers
 {
@@ -27,6 +30,30 @@ namespace DSM.UI.Api.Helpers.JwtHelpers
                 throw;
             }
 
+        }
+
+        public static DecodedTokenStruct DecodeToken(string token)
+        {
+            DecodedTokenStruct decodedToken = new DecodedTokenStruct();
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken tokenObj = handler.ReadToken(token) as JwtSecurityToken;
+            var userClaim = tokenObj.Claims.ToArray()[0];
+            if (userClaim != null)
+            {
+                decodedToken.Username = userClaim.Value;
+            }
+
+            var roleClaim = tokenObj.Claims.ToArray()[1];
+            if (roleClaim != null)
+            {
+                decodedToken.Userrole = roleClaim.Value;
+            }
+
+            decodedToken.ValidFrom = tokenObj.ValidFrom;
+            decodedToken.ValidTo = tokenObj.ValidTo;
+            decodedToken.Issuer = tokenObj.Issuer;
+            decodedToken.IssuedAt = tokenObj.IssuedAt;
+            return decodedToken;
         }
     }
 }
