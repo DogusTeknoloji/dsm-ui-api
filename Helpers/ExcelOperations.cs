@@ -11,7 +11,11 @@ namespace DSM.UI.Api.Helpers
 {
     public static class ExcelOperations
     {
-        public static byte[] ExportToExcel<T>(IEnumerable<T> data, string sheetName = "Sheet1")
+        public static byte[] ExportToExcel<T>(IEnumerable<T> data)
+        {
+            return ExportToExcel(data, "Sheet1");
+        }
+        public static byte[] ExportToExcel<T>(IEnumerable<T> data, string sheetName)
         {
             using (DataTable table = new DataTable())
             {
@@ -38,7 +42,7 @@ namespace DSM.UI.Api.Helpers
                         worksheetPart.Worksheet = new Worksheet(sheetData);
 
                         Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
-                        Sheet sheet = new Sheet()
+                        Sheet sheet = new Sheet
                         {
                             Id = workbookPart.GetIdOfPart(worksheetPart),
                             SheetId = 1,
@@ -47,7 +51,7 @@ namespace DSM.UI.Api.Helpers
 
                         sheets.Append(sheet);
                         Row headerRow = new Row();
-                        List<String> columns = new List<string>();
+                        List<string> columns = new List<string>();
                         foreach (DataColumn column in table.Columns)
                         {
                             columns.Add(column.ColumnName);
@@ -107,9 +111,9 @@ namespace DSM.UI.Api.Helpers
             Borders borders = new Borders();    // <APENDING Borders>
             borders.Append(border0);
 
-            CellFormat cellformat0 = new CellFormat() { FontId = 0, FillId = 0, BorderId = 0 }; // Default style : Mandatory | Style ID =0
+            CellFormat cellformat0 = new CellFormat { FontId = 0, FillId = 0, BorderId = 0 }; // Default style : Mandatory | Style ID =0
 
-            CellFormat cellformat1 = new CellFormat() { FontId = 1 };
+            CellFormat cellformat1 = new CellFormat { FontId = 1 };
             CellFormats cellformats = new CellFormats();
             cellformats.Append(cellformat0);
             cellformats.Append(cellformat1);
