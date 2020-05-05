@@ -17,7 +17,7 @@ namespace DSM.UI.Api.Services
     }
     public class WebAccessLogService : IWebAccessLogService
     {
-        private DSMAuthDbContext _context;
+        private readonly DSMAuthDbContext _context;
         public WebAccessLogService(DSMAuthDbContext context)
         {
             _context = context;
@@ -40,7 +40,7 @@ namespace DSM.UI.Api.Services
             EntityEntry<WebAccessLog> result = await this._context.AddAsync(logData);
             if (result.State == EntityState.Added)
             {
-                int x = await this._context.SaveChangesAsync();
+                _ = await this._context.SaveChangesAsync();
             }
         }
     }

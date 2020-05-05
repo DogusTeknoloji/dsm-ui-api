@@ -14,7 +14,7 @@ namespace DSM.UI.Api.Controllers
     [Route("[controller]")]
     public class CompanyController : ControllerBase
     {
-        private ICompanyService _companyService;
+        private readonly ICompanyService _companyService;
         private readonly AppSettings _appSettings;
 
         public CompanyController(ICompanyService companyService, IOptions<AppSettings> appSettings)

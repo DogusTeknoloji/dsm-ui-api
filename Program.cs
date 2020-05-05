@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace DSM.UI.Api
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {

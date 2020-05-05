@@ -4,12 +4,18 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
+
 namespace DSM.UI.Api.Helpers
 {
     public static class EntityQueryable
     {
 
-        public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering, bool ascending = true)
+        public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering)
+        {
+            return OrderBy(source, ordering, true);
+        }
+        public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering, bool ascending)
         {
             var type = typeof(T);
             var parameter = Expression.Parameter(type, "p");
@@ -40,7 +46,15 @@ namespace DSM.UI.Api.Helpers
             return source.Provider.CreateQuery<T>(resultExp);
         }
 
-        public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, string field, string value, bool throwExceptionIfNoProperty = false, bool throwExceptionIfNoType = false) where TEntity : class
+        public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, string field, string value) where TEntity : class
+        {
+            return WhereContains(query, field, value, false, false);
+        }
+        public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, string field, string value, bool throwExceptionIfNoProperty) where TEntity : class
+        {
+            return WhereContains(query, field, value, throwExceptionIfNoProperty, false);
+        }
+        public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, string field, string value, bool throwExceptionIfNoProperty, bool throwExceptionIfNoType) where TEntity : class
         {
             PropertyInfo propertyInfo = typeof(TEntity).GetProperty(field);
             if (propertyInfo != null)
@@ -52,7 +66,7 @@ namespace DSM.UI.Api.Helpers
                         return query.Where(string.Format("{0}.Contains(@0)", field), value);
                     case TypeCode.Boolean:
                         var boolValue = (value != null
-                            && (value == "1" || value.ToLower() == "true"))
+                            && (value == "1" || value.ToLowerInvariant() == "true"))
                             ? true
                             : false;
                         return query.Where(string.Format("{0} == @0", field), boolValue);
@@ -68,25 +82,28 @@ namespace DSM.UI.Api.Helpers
 
                     default:
                         if (throwExceptionIfNoType)
-                            throw new NotSupportedException(String.Format("Type '{0}' not supported.", typeCode));
+                            throw new NotSupportedException(string.Format("Type '{0}' not supported.", typeCode));
                         break;
                 }
             }
             else
             {
                 if (throwExceptionIfNoProperty)
-                    throw new NotSupportedException(String.Format("Property '{0}' not found.", propertyInfo.Name));
+                    throw new NotSupportedException(string.Format("Property '{0}' not found.", field));
             }
             return query;
         }
-        public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, IEnumerable<PropertyInfo> fields, string value, bool throwExceptionIfNoProperty = false, bool throwExceptionIfNoType = false) where TEntity : class
+        public static IQueryable<TEntity> WhereContains<TEntity>(this IQueryable<TEntity> query, IEnumerable<PropertyInfo> fields, string value) where TEntity : class
         {
-            var queryString = "";
-            foreach (var field in fields)
+            StringBuilder queryStringBuilder = new StringBuilder();
+            foreach (PropertyInfo field in fields)
             {
-                queryString += string.Format("{0}.Contains(@0)", field.Name) + " ||";
+                _ = queryStringBuilder.Append(string.Format("{0}.Contains(@0)", field.Name) + " ||");
             }
+            
+            string queryString = queryStringBuilder.ToString();
             queryString = queryString.Substring(0, queryString.Length - 2);
+
             return query.Where(queryString, value);
         }
     }

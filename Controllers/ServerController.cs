@@ -12,12 +12,10 @@ namespace DSM.UI.Api.Controllers
     [Route("[controller]")]
     public class ServerController : ControllerBase
     {
-        private IServerService _serverService;
-        private readonly AppSettings _appSettings;
+        private readonly IServerService _serverService;
         public ServerController(IServerService serverService, IOptions<AppSettings> appSettings)
         {
             this._serverService = serverService;
-            this._appSettings = appSettings.Value;
         }
         [HttpGet("Search/{term}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
@@ -47,7 +45,7 @@ namespace DSM.UI.Api.Controllers
         }
         [HttpGet("{pagenumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public IActionResult GetServers(int pagenumber, [FromQuery(Name = "fi")]string fieldName = null, [FromQuery(Name = "pos")]int orderPosition = -1)
+        public IActionResult GetServers(int pagenumber, [FromQuery(Name = "fi")]string fieldName, [FromQuery(Name = "pos")]int orderPosition)
         {
             var serverInfo = this._serverService.GetServers(pagenumber, fieldName, orderPosition);
             if (serverInfo == null) return BadRequest(InvalidOperationError.GetInstance());

@@ -44,8 +44,6 @@ namespace DSM.UI.Api
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
-            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -105,8 +103,6 @@ namespace DSM.UI.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            //app.UseHttpsRedirection();
 
             app.UseRouting();
             app.UseAuthentication();

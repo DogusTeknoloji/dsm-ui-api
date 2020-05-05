@@ -12,13 +12,11 @@ namespace DSM.UI.Api.Controllers
     [Route("[controller]")]
     public class SiteController : ControllerBase
     {
-        private ISiteService _siteService;
-        private readonly AppSettings _appSettings;
+        private readonly ISiteService _siteService;
 
         public SiteController(ISiteService siteService, IOptions<AppSettings> appSettings)
         {
             this._siteService = siteService;
-            this._appSettings = appSettings.Value;
         }
 
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
@@ -93,7 +91,7 @@ namespace DSM.UI.Api.Controllers
         }
         [HttpGet("{pageNumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public IActionResult GetSites(int pageNumber, [FromQuery(Name = "fi")]string fieldName = null, [FromQuery(Name = "pos")]int orderPosition = -1)
+        public IActionResult GetSites(int pageNumber, [FromQuery(Name = "fi")]string fieldName, [FromQuery(Name = "pos")]int orderPosition)
         {
             var siteInfo = _siteService.GetSites(pageNumber, fieldName, orderPosition);
             if (siteInfo == null) return BadRequest(InvalidOperationError.GetInstance());

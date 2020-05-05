@@ -11,7 +11,7 @@ namespace DSM.UI.Api.Controllers
     [Route("[controller]")]
     public class DashboardController : ControllerBase
     {
-        private IDashboardService _dashboardService;
+        private readonly IDashboardService _dashboardService;
         private readonly AppSettings _appSettings;
 
         public DashboardController(IDashboardService dashboardService, IOptions<AppSettings> appSettings)

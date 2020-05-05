@@ -11,13 +11,11 @@ namespace DSM.UI.Api.Controllers
     [Route("[controller]")]
     public class ReportController : ControllerBase
     {
-        private IReportsService _reportsService;
-        private readonly AppSettings _appSettings;
+        private readonly IReportsService _reportsService;
 
         public ReportController(IReportsService reportsService, IOptions<AppSettings> appSettings)
         {
             this._reportsService = reportsService;
-            this._appSettings = appSettings.Value;
         }
 
         [HttpGet("overalldiskstatus/{pagenumber}")]

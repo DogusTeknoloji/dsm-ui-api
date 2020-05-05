@@ -10,21 +10,24 @@ namespace DSM.UI.Api.Services
     {
         IEnumerable<OverallDiskStatusItem> GetOverallDiskStatus(int pagenumber);
         IEnumerable<OverallDiskStatusItem> SearchOverallDiskStatus(object term);
+        byte[] DownloadOverallDiskStatus();
         byte[] DownloadOverallDiskStatus(object term = null);
         IEnumerable<ScheduledJobListDTO> GetScheduledJobs(int pagenumber);
         IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term);
+        byte[] DownloadScheduledJobList();
         byte[] DownloadScheduledJobList(object term = null);
 
     }
     public class ReportsService : IReportsService
     {
         private const int _pageItemCount = 100;
-        private DSMStorageDataContext _context;
+        private readonly DSMStorageDataContext _context;
         private const string _numberFormat = "{0:#,#}";
         public ReportsService(DSMStorageDataContext context)
         {
             _context = context;
         }
+
         public IEnumerable<OverallDiskStatusItem> GetOverallDiskStatus(int pagenumber)
         {
             if (pagenumber < 2)
@@ -69,10 +72,8 @@ namespace DSM.UI.Api.Services
                 return query.Distinct();
             }
         }
-
         public IEnumerable<OverallDiskStatusItem> SearchOverallDiskStatus(object term)
         {
-            object queryItem = term;
             IEnumerable<PropertyInfo> stringProperties = typeof(OverallDiskStatusItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.ServerDisks
@@ -98,7 +99,11 @@ namespace DSM.UI.Api.Services
             return results;
         }
 
-        public byte[] DownloadOverallDiskStatus(object term = null)
+        public byte[] DownloadOverallDiskStatus()
+        {
+            return this.DownloadOverallDiskStatus(null);
+        }
+        public byte[] DownloadOverallDiskStatus(object term)
         {
             IEnumerable<OverallDiskStatusItem> results = null;
             if (term == null)
@@ -210,7 +215,11 @@ namespace DSM.UI.Api.Services
             });
         }
 
-        public byte[] DownloadScheduledJobList(object term = null)
+        public byte[] DownloadScheduledJobList()
+        {
+            return this.DownloadScheduledJobList(null);
+        }
+        public byte[] DownloadScheduledJobList(object term)
         {
             IEnumerable<ScheduledJobListDTO> results = null;
             if (term == null)

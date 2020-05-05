@@ -1,5 +1,4 @@
 ﻿using DSM.UI.Api.Helpers;
-using DSM.UI.Api.Helpers.RemoteDesktop;
 using DSM.UI.Api.Models.User;
 using System;
 using System.Collections.Generic;
@@ -15,13 +14,14 @@ namespace DSM.UI.Api.Services
         IEnumerable<User> GetAll();
         User GetByUserName(string userName);
         User Create(User user, string password);
-        void Update(User user, string password = null);
+        void Update(User userParam);
+        void Update(User userParam, string password);
         void Delete(int id);
         List<Domain> GetDomainList();
     }
     public class UserService : IUserService
     {
-        private DSMAuthDbContext _context;
+        private readonly DSMAuthDbContext _context;
 
         public UserService(DSMAuthDbContext context)
         {
@@ -70,7 +70,6 @@ namespace DSM.UI.Api.Services
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-            password = "";
             user.Password = null;
 
             _context.Users.Add(user);
@@ -79,7 +78,12 @@ namespace DSM.UI.Api.Services
             return user;
         }
 
-        public void Update(User userParam, string password = null)
+        public void Update(User userParam)
+        {
+            this.Update(userParam, null);
+        }
+
+        public void Update(User userParam, string password)
         {
             var user = _context.Users.Find(userParam.Id);
 

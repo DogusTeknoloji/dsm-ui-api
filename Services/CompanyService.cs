@@ -16,11 +16,12 @@ namespace DSM.UI.Api.Services
         IEnumerable<string> GetLetters();
         IEnumerable<SearchResult> GetCompanyByLetter(string letter, int pagenumber);
         IEnumerable<SearchResult> GetCompanies(int pagenumber);
-        byte[] DownloadCompanies(object term = null);
+        byte[] DownloadCompanies(object term);
+        byte[] DownloadCompanies();
     }
     public class CompanyService : ICompanyService
     {
-        private DSMStorageDataContext _context;
+        private readonly DSMStorageDataContext _context;
         public CompanyService(DSMStorageDataContext context)
         {
             _context = context;
@@ -90,7 +91,7 @@ namespace DSM.UI.Api.Services
 
             if (pagenumber < 2)
             {
-                var query = records.Take(pageItemCount).Select(x => new SearchResult()
+                var query = records.Take(pageItemCount).Select(x => new SearchResult
                 {
                     CompanyId = x.CompanyId,
                     Name = x.Name
@@ -99,7 +100,7 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
+                var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
                 {
                     CompanyId = x.CompanyId,
                     Name = x.Name
@@ -113,7 +114,7 @@ namespace DSM.UI.Api.Services
             int pageItemCount = 100;
             if (pagenumber < 2)
             {
-                var query = this._context.Companies.Take(pageItemCount).Select(x => new SearchResult()
+                var query = this._context.Companies.Take(pageItemCount).Select(x => new SearchResult
                 {
                     CompanyId = x.CompanyId,
                     Name = x.Name
@@ -122,7 +123,7 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = this._context.Companies.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
+                var query = this._context.Companies.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
                 {
                     CompanyId = x.CompanyId,
                     Name = x.Name
@@ -133,7 +134,6 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<SearchResult> SearchCompanies(object term)
         {
-            object queryItem = term;
             IEnumerable<PropertyInfo> stringProperties = typeof(Company).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.Companies select a;
@@ -147,8 +147,11 @@ namespace DSM.UI.Api.Services
                 Name = x.Name
             });
         }
-
-        public byte[] DownloadCompanies(object term = null)
+        public byte[] DownloadCompanies()
+        {
+            return this.DownloadCompanies(null);
+        }
+        public byte[] DownloadCompanies(object term)
         {
 
             IEnumerable<SearchResult> results = null;
