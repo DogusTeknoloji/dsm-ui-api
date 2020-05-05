@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace DSM.UI.Api.Helpers.JwtHelpers
 {
     public sealed class JwtTokenBuilder
     {
-        private SecurityKey _securityKey = null;
+        private SecurityKey _securityKey;
         private string _subject = "";
         private string _issuer = "";
         private string _audience = "";
-        private Dictionary<string, string> _claims = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _claims = new Dictionary<string, string>();
         private int _expirationValue = 6;
         private ExpirationUnit _expirationUnit = ExpirationUnit.Hours;
 
@@ -56,7 +55,7 @@ namespace DSM.UI.Api.Helpers.JwtHelpers
 
         public JwtTokenBuilder AddClaims(Dictionary<string, string> claims)
         {
-            this._claims.Union(claims);
+            _ = this._claims.Union(claims);
             return this;
         }
 
