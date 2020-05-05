@@ -37,6 +37,12 @@ namespace DSM.UI.Api.Helpers.JwtHelpers
             DecodedTokenStruct decodedToken = new DecodedTokenStruct();
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             JwtSecurityToken tokenObj = handler.ReadToken(token) as JwtSecurityToken;
+
+            if (tokenObj.Claims.Count() < 2)
+            {
+                return decodedToken;
+            }
+
             var userClaim = tokenObj.Claims.ToArray()[0];
             if (userClaim != null)
             {
@@ -48,7 +54,6 @@ namespace DSM.UI.Api.Helpers.JwtHelpers
             {
                 decodedToken.Userrole = roleClaim.Value;
             }
-
             decodedToken.ValidFrom = tokenObj.ValidFrom;
             decodedToken.ValidTo = tokenObj.ValidTo;
             decodedToken.Issuer = tokenObj.Issuer;
