@@ -156,7 +156,6 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<SearchResult> SearchSites(object term)
         {
-            object queryItem = term;
             IEnumerable<PropertyInfo> stringProperties = typeof(Site).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.Sites select a;
