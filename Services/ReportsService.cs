@@ -11,11 +11,11 @@ namespace DSM.UI.Api.Services
         IEnumerable<OverallDiskStatusItem> GetOverallDiskStatus(int pagenumber);
         IEnumerable<OverallDiskStatusItem> SearchOverallDiskStatus(object term);
         byte[] DownloadOverallDiskStatus();
-        byte[] DownloadOverallDiskStatus(object term = null);
+        byte[] DownloadOverallDiskStatus(object term);
         IEnumerable<ScheduledJobListDTO> GetScheduledJobs(int pagenumber);
         IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term);
         byte[] DownloadScheduledJobList();
-        byte[] DownloadScheduledJobList(object term = null);
+        byte[] DownloadScheduledJobList(object term);
 
     }
     public class ReportsService : IReportsService
