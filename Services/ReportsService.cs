@@ -193,8 +193,7 @@ namespace DSM.UI.Api.Services
         }
 
         public IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term)
-        {
-            object queryItem = term;
+        {;
             IEnumerable<PropertyInfo> stringProperties = typeof(ScheduledJobItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.ScheduledJobItems select a;
