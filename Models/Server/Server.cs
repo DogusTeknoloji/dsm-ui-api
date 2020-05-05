@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DSM.UI.Api.Models.Server
 {
@@ -16,14 +14,11 @@ namespace DSM.UI.Api.Models.Server
         public string ServerName { get; set; }
         [Required]
         public string HostName { get; set; }
-        //[Column("Company")]
-        //public string CmpFix { get; set; }
         public string IpAddress { get; set; }
         public string CustomIp { get; set; }
         public string PhysicalLocation { get; set; }
         public string Responsible { get; set; }
         public string ServerType { get; set; }
-        //public DateTime DateCurrent { get; set; }
         public DateTime? LastBackup { get; set; }
         public string OperatingSystem { get; set; }
         public DateTime? Boottime { get; set; }
@@ -42,5 +37,3 @@ namespace DSM.UI.Api.Models.Server
         public virtual List<ScheduledJobItem> ScheduledJobs { get; set; }
     }
 }
-// ServerId, ServerName, HostName, Company, IpAddress, CustomIp, PhysicalLocation, Responsible, ServerType, LastBackup, OperatingSystem, Boottime, TotalCPU, TotalMemory, MemoryUsage, ToolsRunningStatus, ESXI, 
-//Cluster, Notes
