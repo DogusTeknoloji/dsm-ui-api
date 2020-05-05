@@ -3,12 +3,12 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["DSM.UI.Api.csproj", ""]
 RUN dotnet restore "./DSM.UI.Api.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR /src/.
 RUN dotnet build "DSM.UI.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
