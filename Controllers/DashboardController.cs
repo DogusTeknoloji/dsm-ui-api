@@ -12,12 +12,10 @@ namespace DSM.UI.Api.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
-        private readonly AppSettings _appSettings;
 
         public DashboardController(IDashboardService dashboardService, IOptions<AppSettings> appSettings)
         {
             this._dashboardService = dashboardService;
-            this._appSettings = appSettings.Value;
         }
 
         [HttpGet("appmanagement/")]

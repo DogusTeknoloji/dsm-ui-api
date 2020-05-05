@@ -11,11 +11,11 @@ namespace DSM.UI.Api.Services
         IEnumerable<OverallDiskStatusItem> GetOverallDiskStatus(int pagenumber);
         IEnumerable<OverallDiskStatusItem> SearchOverallDiskStatus(object term);
         byte[] DownloadOverallDiskStatus();
-        byte[] DownloadOverallDiskStatus(object term = null);
+        byte[] DownloadOverallDiskStatus(object term);
         IEnumerable<ScheduledJobListDTO> GetScheduledJobs(int pagenumber);
         IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term);
         byte[] DownloadScheduledJobList();
-        byte[] DownloadScheduledJobList(object term = null);
+        byte[] DownloadScheduledJobList(object term);
 
     }
     public class ReportsService : IReportsService
@@ -193,8 +193,7 @@ namespace DSM.UI.Api.Services
         }
 
         public IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term)
-        {
-            object queryItem = term;
+        {;
             IEnumerable<PropertyInfo> stringProperties = typeof(ScheduledJobItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.ScheduledJobItems select a;

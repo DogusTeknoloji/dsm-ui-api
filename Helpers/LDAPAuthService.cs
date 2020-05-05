@@ -1,21 +1,23 @@
 ﻿using DSM.UI.Api.Models.User;
 using DSM.UI.Api.Services;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Security.Principal;
 using System.Text.RegularExpressions;
 
 namespace DSM.UI.Api.Helpers
 {
     public static class LDAPAuthService
     {
-        public const string MAILREGEXPATTERN = @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
+        public static string MAILREGEXPATTERN
+        {
+            get
+            {
+                return @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
+            }
+        }
         public static DomainUserInfo AuthenticateActiveDirectory(IEnumerable<Domain> domains, string UserName, string Password)
         {
             DomainUserInfo userInfo = new DomainUserInfo();
@@ -36,7 +38,6 @@ namespace DSM.UI.Api.Helpers
                         userInfo.ProfileImage = "data:image/png;base64," + base64String;
                     }
 
-                    object nativeObject = entry.NativeObject;
                     userInfo.DomainId = domain.DomainId;
                     userInfo.FullName = GetFullname(UserName);
                     userInfo.Username = UserName;

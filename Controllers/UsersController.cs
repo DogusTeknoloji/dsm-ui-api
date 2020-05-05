@@ -13,13 +13,12 @@ namespace DSM.UI.Api.Controllers
     public class UsersController : ControllerBase
     {
 
-        private IUserService _userService;
+        private readonly IUserService _userService;
         private readonly AppSettings _appSettings;
-
         public UsersController(IUserService userService, IOptions<AppSettings> appSettings)
         {
-            _userService = userService;
-            _appSettings = appSettings.Value;
+            this._userService = userService;
+            this._appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
@@ -99,7 +98,7 @@ namespace DSM.UI.Api.Controllers
                 user = this._userService.GetByUserName(domainUser.Username);
                 if (user == null) return StatusCode(500, new { message = "LDAP Register failed." });
             }
-            string tokenString = AuthenticationHelper.GetToken(user, _appSettings.Secret);
+            string tokenString = AuthenticationHelper.GetToken(user, this._appSettings.Secret);
 
             return Ok(new
             {
