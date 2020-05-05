@@ -38,6 +38,10 @@ namespace DSM.UI.Api.Helpers
             if (decodedToken.ValidTo != null)
             {
                 TimeToExpire_TimeSpan = decodedToken.ValidTo - DateTime.Now;
+                if (TimeToExpire_TimeSpan.Value.TotalMilliseconds < 0)
+                {
+                    TimeToExpire_TimeSpan = new TimeSpan(0);
+                }
                 TimeToExpire = new DateTime() + TimeToExpire_TimeSpan;
             }
 
