@@ -45,7 +45,7 @@ namespace DSM.UI.Api.Helpers
                 TimeToExpire = new DateTime() + TimeToExpire_TimeSpan;
             }
 
-            WebAccessLog accessLog = new WebAccessLog()
+            WebAccessLog accessLog = new WebAccessLog
             {
                 UserIpAddress = context.Connection.RemoteIpAddress.MapToIPv4().ToString(),
                 UserPort = context.Connection.RemotePort,
