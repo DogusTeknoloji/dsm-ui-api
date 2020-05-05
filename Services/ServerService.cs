@@ -16,17 +16,19 @@ namespace DSM.UI.Api.Services
         DetailsHeader GetHeader(int id);
         DetailsGeneral GetDetailsGeneral(int id);
         IEnumerable<DetailsSites> GetDetailsSites(int id);
-        IEnumerable<SearchResult> GetServers(int pagenumber, string fieldName = null, int orderPosition = -1);
+        IEnumerable<SearchResult> GetServers(int pagenumber);
+        IEnumerable<SearchResult> GetServers(int pagenumber, string fieldName, int orderPosition);
         IEnumerable<string> GetLetters();
         IEnumerable<SearchResult> GetServersByLetter(string letter, int pagenumber);
-        byte[] DownloadServers(object term = null);
+        byte[] DownloadServers();
+        byte[] DownloadServers(object term);
         byte[] DownloadRDPFile(RdpInfo rdpInfo);
         string GetServerCheckDate();
     }
 
     public class ServerService : IServerService
     {
-        private DSMStorageDataContext _context;
+        private readonly DSMStorageDataContext _context;
         public ServerService(DSMStorageDataContext context)
         {
             _context = context;
@@ -49,7 +51,7 @@ namespace DSM.UI.Api.Services
             }
 
             string lastCheckDate = this._context.VCenterLogs.Where(x => x.LogName == "DiskStatus").Select(x => x.LogValue).FirstOrDefault();
-            lastCheckDate = Convert.ToDateTime(lastCheckDate).ToString();
+            lastCheckDate = Convert.ToDateTime(lastCheckDate).ToString(CultureInfo.InvariantCulture);
             string noData = "No-Data";
             string comingSoon = "#COMING_SOON#";
             string numberFormat = "{0:#,#}";
@@ -130,10 +132,14 @@ namespace DSM.UI.Api.Services
             return firstLetters;
         }
 
-        public IEnumerable<SearchResult> GetServers(int pagenumber, string fieldName = null, int orderPosition = -1)
+        public IEnumerable<SearchResult> GetServers(int pagenumber)
+        {
+            return this.GetServers(pagenumber, null, -1);
+        }
+        public IEnumerable<SearchResult> GetServers(int pagenumber, string fieldName, int orderPosition)
         {
             var orderQuery = from a in this._context.Servers select a;
-            
+
             if (!(fieldName is null) && orderPosition != -1)
             {
                 PropertyInfo orderColumn = typeof(Server).GetProperties().FirstOrDefault(prop => prop.Name.ToLower(CultureInfo.GetCultureInfo("en-US")) == fieldName.ToLower(CultureInfo.GetCultureInfo("en-US")));
@@ -145,7 +151,7 @@ namespace DSM.UI.Api.Services
             int pageItemCount = 100;
             if (pagenumber < 2)
             {
-                var query = orderQuery.Take(pageItemCount).Select(x => new SearchResult()
+                var query = orderQuery.Take(pageItemCount).Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
@@ -160,7 +166,7 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = orderQuery.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
+                var query = orderQuery.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
@@ -182,7 +188,7 @@ namespace DSM.UI.Api.Services
 
             if (pagenumber < 2)
             {
-                var query = records.Take(pageItemCount).Select(x => new SearchResult()
+                var query = records.Take(pageItemCount).Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
@@ -197,7 +203,7 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult()
+                var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
@@ -214,7 +220,6 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<SearchResult> SearchServers(object term)
         {
-            object queryItem = term;
             IEnumerable<PropertyInfo> stringProperties = typeof(Server).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.Servers select a;
@@ -234,14 +239,17 @@ namespace DSM.UI.Api.Services
                 ServerId = x.ServerId
             });
         }
-
-        public byte[] DownloadServers(object term = null)
+        public byte[] DownloadServers()
+        {
+            return this.DownloadServers(null);
+        }
+        public byte[] DownloadServers(object term)
         {
             IEnumerable<SearchResult> results = null;
             if (term == null)
             {
                 var query = this._context.Servers;
-                results = query.ToList().Select(x => new SearchResult()
+                results = query.ToList().Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,
                     CompanyName = x.Company.Name,
@@ -290,7 +298,7 @@ namespace DSM.UI.Api.Services
         {
             var query = from a in _context.VCenterLogs where a.LogName == "ServerInventory" select a.LogValue;
             string checkDate = query.FirstOrDefault();
-            checkDate = Convert.ToDateTime(checkDate).ToString();
+            checkDate = Convert.ToDateTime(checkDate).ToString(CultureInfo.InvariantCulture);
             return checkDate;
         }
     }
