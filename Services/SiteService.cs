@@ -17,18 +17,19 @@ namespace DSM.UI.Api.Services
         IEnumerable<DetailsPackage> GetDetailsPackages(long id);
         IEnumerable<DetailsBackendServiceConnectionString> GetDetailsConnectionStrings(long id);
         IEnumerable<DetailsBackendServiceEndpoint> GetDetailsEndpoint(long id);
-        IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName = null, int orderPosition = -1);
+        IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName, int orderPosition);
         IEnumerable<string> GetLetters();
+        IEnumerable<Core.Models.Site> GetSitesByLetter(string letter);
         IEnumerable<Core.Models.Site> GetSitesByLetter(string letter, int pagenumber);
-        byte[] DownloadSites(object term = null);
+        byte[] DownloadSites();
+        byte[] DownloadSites(object term);
     }
     public class SiteService : ISiteService
     {
-        private DSMStorageDataContext _context;
+        private readonly DSMStorageDataContext _context;
         public SiteService(DSMStorageDataContext context)
         {
             _context = context;
-            //context.Database.EnsureCreated();
         }
 
         public IEnumerable<DetailsBinding> GetDetailsBindings(long id)
@@ -177,7 +178,7 @@ namespace DSM.UI.Api.Services
             return results;
         }
 
-        public IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName = null, int orderPosition = -1)
+        public IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName, int orderPosition)
         {
             var orderQuery = from a in this._context.Sites select a;
 
@@ -233,7 +234,11 @@ namespace DSM.UI.Api.Services
             return firstLetters;
         }
 
-        public IEnumerable<Core.Models.Site> GetSitesByLetter(string letter, int pagenumber = 1)
+        public IEnumerable<Core.Models.Site> GetSitesByLetter(string letter)
+        {
+            return this.GetSitesByLetter(letter, 1);
+        }
+        public IEnumerable<Core.Models.Site> GetSitesByLetter(string letter, int pagenumber)
         {
             int pageItemCount = 100;
             var records = this._context.Sites.Where(x => x.Name.StartsWith(letter));
@@ -250,10 +255,13 @@ namespace DSM.UI.Api.Services
             }
         }
 
-        public byte[] DownloadSites(object term = null)
+        public byte[] DownloadSites()
+        {
+            return this.DownloadSites(null);
+        }
+        public byte[] DownloadSites(object term)
         {
             IEnumerable<SearchResult> results = null;
-            object queryItem = term;
             if (term == null)
             {
                 var query = this._context.Sites;
