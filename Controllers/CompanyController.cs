@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 
 namespace DSM.UI.Api.Controllers
 {
@@ -15,12 +13,10 @@ namespace DSM.UI.Api.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyService _companyService;
-        private readonly AppSettings _appSettings;
 
         public CompanyController(ICompanyService companyService, IOptions<AppSettings> appSettings)
         {
             this._companyService = companyService;
-            this._appSettings = appSettings.Value;
         }
         [HttpGet("Search/{term}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]

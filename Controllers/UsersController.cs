@@ -13,13 +13,11 @@ namespace DSM.UI.Api.Controllers
     public class UsersController : ControllerBase
     {
 
-        private IUserService _userService;
-        private readonly AppSettings _appSettings;
+        private readonly IUserService _userService;
 
         public UsersController(IUserService userService, IOptions<AppSettings> appSettings)
         {
             _userService = userService;
-            _appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
