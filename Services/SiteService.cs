@@ -17,6 +17,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<DetailsPackage> GetDetailsPackages(long id);
         IEnumerable<DetailsBackendServiceConnectionString> GetDetailsConnectionStrings(long id);
         IEnumerable<DetailsBackendServiceEndpoint> GetDetailsEndpoint(long id);
+        IEnumerable<SearchResult> GetSites(int pagenumber);
         IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName, int orderPosition);
         IEnumerable<string> GetLetters();
         IEnumerable<Core.Models.Site> GetSitesByLetter(string letter);
@@ -177,7 +178,10 @@ namespace DSM.UI.Api.Services
 
             return results;
         }
-
+        public IEnumerable<SearchResult> GetSites(int pagenumber)
+        {
+            return this.GetSites(pagenumber, null, -1);
+        }
         public IEnumerable<SearchResult> GetSites(int pagenumber, string fieldName, int orderPosition)
         {
             var orderQuery = from a in this._context.Sites select a;
