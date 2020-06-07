@@ -17,7 +17,7 @@ namespace DSM.UI.Api.Models.AzureDevOps
         {
             ProjectResult p = new ProjectResult
             {
-                ProjectId = this.Id,
+                ProjectId = this.Id.ToString(),
                 ProjectLastUpdateTime = this.LastUpdateTime,
                 ProjectName = this.Name,
                 ProjectPublicVisibility = this.Visibility != "private",

@@ -3,17 +3,14 @@ using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Newtonsoft.Json;
-using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,7 +43,10 @@ namespace DSM.UI.Api
             services.Configure<CacheDBSettings>(cacheDbSettingsSection);
 
             var cachingSetings = cacheDbSettingsSection.Get<CacheDBSettings>();
-            services.AddSingleton<ICacheDBSettings>(sp => sp.GetRequiredService<IOptions<CacheDBSettings>>().Value);
+
+            var client = new MongoClient(cachingSetings.ConnectionString);
+            var database = client.GetDatabase(cachingSetings.DatabaseName);
+            Helpers.Caching.CacheHelper.CacheDatabase = database;
 
             // Configure JWT Auth
             var appSettings = appSettingsSection.Get<AppSettings>();

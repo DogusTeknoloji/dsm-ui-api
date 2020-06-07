@@ -20,77 +20,101 @@ namespace DSM.UI.Api.Services
 
         public async Task<IEnumerable<ProjectResult>> GetProjectsAsync()
         {
-            string projectsUrl = AzureDevOpsUrl.ProjectsUrl(_organization);
-
-            string rawJson = await RequestHelper.Evaluate(projectsUrl);
-
-            GenericHolder<Project> projectHolder = JsonConvert.DeserializeObject<GenericHolder<Project>>(rawJson);
-
-            if (projectHolder != null && projectHolder?.Count > 0)
+            CacheDBService<ProjectResult> cacheService = new CacheDBService<ProjectResult>("AzureDevOpsProjects");
+            IEnumerable<ProjectResult> cacheResults = cacheService.Get();
+            if (cacheResults.Count() < 1)
             {
-                IEnumerable<Project> projects = projectHolder.Value;
-                var results = projects.Select(p => p.Convert());
-                return results;
+                string projectsUrl = AzureDevOpsUrl.ProjectsUrl(_organization);
 
+                string rawJson = await RequestHelper.Evaluate(projectsUrl);
+
+                GenericHolder<Project> projectHolder = JsonConvert.DeserializeObject<GenericHolder<Project>>(rawJson);
+
+                if (projectHolder != null && projectHolder?.Count > 0)
+                {
+                    IEnumerable<Project> projects = projectHolder.Value;
+                    IEnumerable<ProjectResult> results = projects.Select(p => p.Convert());
+
+
+                    cacheService.CreateMultiple(results, overwrite: true);
+
+                    return results;
+                }
             }
-            return null;
+            return cacheResults;
         }
 
         public async Task<IEnumerable<DeploymentGroupResult>> GetDeploymentGroupsAsync()
         {
-            List<DeploymentGroupResult> results = new List<DeploymentGroupResult>();
-            IEnumerable<ProjectResult> projects = await this.GetProjectsAsync();
-            foreach (ProjectResult project in projects)
+            CacheDBService<DeploymentGroupResult> cacheService = new CacheDBService<DeploymentGroupResult>("AzureDevOpsDeploymentGroups");
+            IEnumerable<DeploymentGroupResult> cacheResults = cacheService.Get();
+            if (cacheResults.Count() < 1)
             {
-                string projectId = project.ProjectId.ToString();
-                string deploymentGroupsUrl = AzureDevOpsUrl.DeploymentGroupsUrl(_organization, projectId);
-
-                string rawJson = await RequestHelper.Evaluate(deploymentGroupsUrl);
-
-                GenericHolder<DeploymentGroup> deploymentGroupHolder = JsonConvert.DeserializeObject<GenericHolder<DeploymentGroup>>(rawJson);
-
-                if (deploymentGroupHolder != null && deploymentGroupHolder?.Count > 0)
+                List<DeploymentGroupResult> results = new List<DeploymentGroupResult>();
+                IEnumerable<ProjectResult> projects = await this.GetProjectsAsync();
+                foreach (ProjectResult project in projects)
                 {
-                    IEnumerable<DeploymentGroup> deploymentGroups = deploymentGroupHolder.Value;
-                    var subResults = deploymentGroups.Select(p => p.Convert());
-                    results.AddRange(subResults);
+                    string projectId = project.ProjectId.ToString();
+                    string deploymentGroupsUrl = AzureDevOpsUrl.DeploymentGroupsUrl(_organization, projectId);
+
+                    string rawJson = await RequestHelper.Evaluate(deploymentGroupsUrl);
+
+                    GenericHolder<DeploymentGroup> deploymentGroupHolder = JsonConvert.DeserializeObject<GenericHolder<DeploymentGroup>>(rawJson);
+
+                    if (deploymentGroupHolder != null && deploymentGroupHolder?.Count > 0)
+                    {
+                        IEnumerable<DeploymentGroup> deploymentGroups = deploymentGroupHolder.Value;
+                        var subResults = deploymentGroups.Select(p => p.Convert());
+                        results.AddRange(subResults);
+                    }
                 }
+
+                cacheService.CreateMultiple(results, overwrite: true);
+                return results;
             }
-            return results;
+            return cacheResults;
         }
 
         public async Task<IEnumerable<DeploymentAgentResult>> GetDeploymentAgentsAsync()
         {
-            List<DeploymentAgentResult> results = new List<DeploymentAgentResult>();
-            IEnumerable<DeploymentGroupResult> deploymentGroups = await this.GetDeploymentGroupsAsync();
-            foreach (DeploymentGroupResult deploymentGroup in deploymentGroups)
+            CacheDBService<DeploymentAgentResult> cacheService = new CacheDBService<DeploymentAgentResult>("AzureDevOpsAgents");
+            IEnumerable<DeploymentAgentResult> cacheResults = cacheService.Get();
+            if (cacheResults.Count() < 1)
             {
-                string projectId = deploymentGroup.ProjectId.ToString();
-                string deploymentGroupId = deploymentGroup.DeploymentGroupId.ToString(); ;
-
-                string deploymentTargetsUrl = AzureDevOpsUrl.TargetsUrl(_organization, projectId, deploymentGroupId);
-                string rawJson = await RequestHelper.Evaluate(deploymentTargetsUrl);
-
-                GenericHolder<DeploymentTarget> deploymentTargetHolder = JsonConvert.DeserializeObject<GenericHolder<DeploymentTarget>>(rawJson);
-
-                if (deploymentTargetHolder != null && deploymentTargetHolder?.Count > 0)
+                List<DeploymentAgentResult> results = new List<DeploymentAgentResult>();
+                IEnumerable<DeploymentGroupResult> deploymentGroups = await this.GetDeploymentGroupsAsync();
+                foreach (DeploymentGroupResult deploymentGroup in deploymentGroups)
                 {
-                    IEnumerable<DeploymentTarget> deploymentTargets = deploymentTargetHolder.Value;
-                    foreach (DeploymentTarget deploymentTarget in deploymentTargets)
+                    string projectId = deploymentGroup.ProjectId.ToString();
+                    string deploymentGroupId = deploymentGroup.DeploymentGroupId.ToString(); ;
+
+                    string deploymentTargetsUrl = AzureDevOpsUrl.TargetsUrl(_organization, projectId, deploymentGroupId);
+                    string rawJson = await RequestHelper.Evaluate(deploymentTargetsUrl);
+
+                    GenericHolder<DeploymentTarget> deploymentTargetHolder = JsonConvert.DeserializeObject<GenericHolder<DeploymentTarget>>(rawJson);
+
+                    if (deploymentTargetHolder != null && deploymentTargetHolder?.Count > 0)
                     {
-                        if (deploymentTarget.Agent == null) continue;
-                        var subResult = deploymentTarget.Convert();
+                        IEnumerable<DeploymentTarget> deploymentTargets = deploymentTargetHolder.Value;
+                        foreach (DeploymentTarget deploymentTarget in deploymentTargets)
+                        {
+                            if (deploymentTarget.Agent == null) continue;
+                            var subResult = deploymentTarget.Convert();
 
-                        subResult.DeploymentGroupId = deploymentGroup.DeploymentGroupId.ToString();
-                        subResult.DeploymentGroupName = deploymentGroup.DeploymentGroupName;
-                        subResult.ProjectId = deploymentGroup.ProjectId.ToString();
-                        subResult.ProjectName = deploymentGroup.ProjectName;
+                            subResult.DeploymentGroupId = deploymentGroup.DeploymentGroupId.ToString();
+                            subResult.DeploymentGroupName = deploymentGroup.DeploymentGroupName;
+                            subResult.ProjectId = deploymentGroup.ProjectId.ToString();
+                            subResult.ProjectName = deploymentGroup.ProjectName;
 
-                        results.Add(subResult);
+                            results.Add(subResult);
+                        }
                     }
                 }
+
+                cacheService.CreateMultiple(results, overwrite: true);
+                return results;
             }
-            return results;
+            return cacheResults;
         }
     }
 
