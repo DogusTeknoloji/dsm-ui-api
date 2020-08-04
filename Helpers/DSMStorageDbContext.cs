@@ -2,6 +2,7 @@
 using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.Company;
 using DSM.UI.Api.Models.Dashboard;
+using DSM.UI.Api.Models.DatabasePortal;
 using DSM.UI.Api.Models.Reports;
 using DSM.UI.Api.Models.Server;
 using Microsoft.EntityFrameworkCore;
@@ -201,5 +202,6 @@ namespace DSM.UI.Api
         public DbSet<ScheduledJobItem> ScheduledJobItems { get; set; }
         public DbSet<AppManagementLink> AppManagementLinks { get; set; }
         public DbSet<VCenterLog> VCenterLogs { get; set; }
+        public DbSet<DbInventory> Dbinventory { get; set; }
     }
 }

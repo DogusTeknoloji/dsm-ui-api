@@ -36,6 +36,9 @@ namespace DSM.UI.Api
             services.AddDbContext<DSMAuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DSMAuthServer")), ServiceLifetime.Transient);
             services.AddDbContext<DSMStorageDataContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DSMStorageServer")));
 
+            services.AddDbContext<DSMStorageDataContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.
+                GetConnectionString("DSMDatabasePortalServerKey")));
+
             // Configure Settings object
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -89,6 +92,7 @@ namespace DSM.UI.Api
             services.AddScoped<IReportsService, ReportsService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IWebAccessLogService, WebAccessLogService>();
+            services.AddScoped<IDatabasePortalService, DatabasePortalService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
