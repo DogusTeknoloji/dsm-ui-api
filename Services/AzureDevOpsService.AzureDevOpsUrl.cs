@@ -9,5 +9,4 @@
             public static string TargetsUrl(string organization, string projectId, string deploymentGroupId) => $"https://dev.azure.com/{organization}/{projectId}/_apis/distributedtask/deploymentgroups/{deploymentGroupId}/targets?api-version=5.1-preview.1";
         }
     }
-
 }
