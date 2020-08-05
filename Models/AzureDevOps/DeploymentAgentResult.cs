@@ -25,6 +25,5 @@ namespace DSM.UI.Api.Models.AzureDevOps
         public string CacheId { get => this.DeploymentGroupId + this.AgentId.ToString(); set { } }
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime ExpireDate { get; set; } = DateTime.Now.AddMinutes(15);
-
     }
 }
