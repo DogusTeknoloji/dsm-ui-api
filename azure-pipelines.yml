@@ -5,11 +5,11 @@ pool:
   vmImage: 'ubuntu-latest'
 name: $(Year:yy).$(DayOfYear).$(Rev:rr)
 steps:
+
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'publish'
-    publishWebProjects: false
-    arguments: '-c $(build-configuration) -o $(build-dir) -r $(windows-os) /p:EnvironmentName=$(env-name)'
+    command: 'restore'
+    feedsToUse: 'select'
 
 - task: replacetokens@3
   inputs:
@@ -21,17 +21,11 @@ steps:
     tokenPrefix: '#{'
     tokenSuffix: '}#'
 
-- task: CopyFiles@2
+- task: DotNetCoreCLI@2
   inputs:
-    Contents: '**/$(build-dir)/**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    CleanTargetFolder: true
-
-- task: CopyFiles@2
-  inputs:
-    Contents: '**/appsettings.json'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    OverWrite: true
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '-c $(build-configuration) -o $(Build.ArtifactStagingDirectory) -r $(windows-os) /p:EnvironmentName=$(env-name)'
 
 - task: PublishBuildArtifacts@1
   inputs:
