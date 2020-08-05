@@ -14,6 +14,5 @@ namespace DSM.UI.Api.Models.AzureDevOps
         public int? Size { get; set; }
         public bool? IsLegacy { get; set; }
         public object Options { get; set; }
-
     }
 }
