@@ -12,7 +12,6 @@ namespace DSM.UI.Api.Services
         Task<IEnumerable<ProjectResult>> GetProjectsAsync();
         Task<IEnumerable<DeploymentGroupResult>> GetDeploymentGroupsAsync();
         Task<IEnumerable<DeploymentAgentResult>> GetDeploymentAgentsAsync();
-
     }
     public partial class AzureDevOpsService : IAzureDevOpsService
     {
@@ -34,8 +33,6 @@ namespace DSM.UI.Api.Services
                 {
                     IEnumerable<Project> projects = projectHolder.Value;
                     IEnumerable<ProjectResult> results = projects.Select(p => p.Convert());
-
-
                     cacheService.CreateMultiple(results, overwrite: true);
 
                     return results;
@@ -86,7 +83,7 @@ namespace DSM.UI.Api.Services
                 foreach (DeploymentGroupResult deploymentGroup in deploymentGroups)
                 {
                     string projectId = deploymentGroup.ProjectId.ToString();
-                    string deploymentGroupId = deploymentGroup.DeploymentGroupId.ToString(); ;
+                    string deploymentGroupId = deploymentGroup.DeploymentGroupId.ToString();
 
                     string deploymentTargetsUrl = AzureDevOpsUrl.TargetsUrl(_organization, projectId, deploymentGroupId);
                     string rawJson = await RequestHelper.Evaluate(deploymentTargetsUrl);
@@ -110,12 +107,11 @@ namespace DSM.UI.Api.Services
                         }
                     }
                 }
-
+                
                 cacheService.CreateMultiple(results, overwrite: true);
                 return results;
             }
             return cacheResults;
         }
     }
-
 }
