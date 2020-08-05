@@ -6,11 +6,6 @@ pool:
 name: $(Year:yy).$(DayOfYear).$(Rev:rr)
 steps:
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    feedsToUse: 'select'
-
 - task: replacetokens@3
   inputs:
     targetFiles: '**/appsettings.json'
@@ -25,7 +20,13 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '-c $(build-configuration) -o $(Build.ArtifactStagingDirectory) -r $(windows-os) /p:EnvironmentName=$(env-name)'
+    arguments: '-c $(build-configuration) -o $(build-dir) -r $(windows-os) /p:EnvironmentName=$(env-name)'
+
+- task: CopyFiles@1
+  inputs:
+    Contents: '**/$(build-dir)/**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
 
 - task: PublishBuildArtifacts@1
   inputs:
