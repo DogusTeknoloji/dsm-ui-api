@@ -39,6 +39,5 @@ namespace DSM.UI.Api.Controllers
         {
             return Ok(_databasePortalService.Search(term));
         }
-
     }
 }
