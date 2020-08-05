@@ -4,11 +4,7 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 name: $(Year:yy).$(DayOfYear).$(Rev:rr)
-
 steps:
-- script: dotnet build --configuration $(build-configuration)
-  displayName: 'dotnet build $(build-configuration)'
-
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
@@ -17,6 +13,7 @@ steps:
 
 - task: replacetokens@3
   inputs:
+    rootDirectory: '$(build-dir)'
     targetFiles: '**/appsettings.json'
     encoding: 'auto'
     writeBOM: true
