@@ -3,8 +3,8 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-latest'
-
 name: $(Year:yy).$(DayOfYear).$(Rev:rr)
+
 steps:
 - script: dotnet build --configuration $(build-configuration)
   displayName: 'dotnet build $(build-configuration)'
@@ -14,14 +14,9 @@ steps:
     command: 'publish'
     publishWebProjects: false
     arguments: '-c $(build-configuration) -o $(build-dir) -r $(windows-os) /p:EnvironmentName=$(env-name)'
-- task: CopyFiles@1
-  inputs:
-    Contents: '**/$(build-dir)/**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    CleanTargetFolder: true
+
 - task: replacetokens@3
   inputs:
-    rootDirectory: '$(Build.ArtifactStagingDirectory)'
     targetFiles: '**/appsettings.json'
     encoding: 'auto'
     writeBOM: true
@@ -29,6 +24,12 @@ steps:
     keepToken: false
     tokenPrefix: '#{'
     tokenSuffix: '}#'
+
+- task: CopyFiles@1
+  inputs:
+    Contents: '**/$(build-dir)/**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
 
 - task: PublishBuildArtifacts@1
   inputs:
