@@ -13,7 +13,6 @@ steps:
 
 - task: replacetokens@3
   inputs:
-    rootDirectory: '$(build-dir)'
     targetFiles: '**/appsettings.json'
     encoding: 'auto'
     writeBOM: true
@@ -22,11 +21,17 @@ steps:
     tokenPrefix: '#{'
     tokenSuffix: '}#'
 
-- task: CopyFiles@1
+- task: CopyFiles@2
   inputs:
     Contents: '**/$(build-dir)/**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     CleanTargetFolder: true
+
+- task: CopyFiles@2
+  inputs:
+    Contents: '**/appsettings.json'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    OverWrite: true
 
 - task: PublishBuildArtifacts@1
   inputs:
