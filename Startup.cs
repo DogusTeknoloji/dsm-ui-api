@@ -3,15 +3,14 @@ using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using Newtonsoft.Json;
-using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,8 +38,21 @@ namespace DSM.UI.Api
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
+            var cacheDbSettingsSection = this.Configuration.GetSection(nameof(CacheDBSettings));
+            services.Configure<CacheDBSettings>(cacheDbSettingsSection);
+
+            var cachingSetings = cacheDbSettingsSection.Get<CacheDBSettings>();
+
+            var client = new MongoClient(cachingSetings.ConnectionString);
+            var database = client.GetDatabase(cachingSetings.DatabaseName);
+            Helpers.Caching.CacheHelper.CacheDatabase = database;
+
             // Configure JWT Auth
             var appSettings = appSettingsSection.Get<AppSettings>();
+
+            Helpers.AzureDevOps.RequestHelper.AzureDevOpsToken = appSettings.AzureDevOpsToken;
+            Helpers.AzureDevOps.RequestHelper.AzureDevOpsOrganizationName = appSettings.AzureDevOpsOrganizationName;
+
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             services.AddAuthentication(x =>
@@ -88,6 +100,7 @@ namespace DSM.UI.Api
             services.AddScoped<IReportsService, ReportsService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IWebAccessLogService, WebAccessLogService>();
+            services.AddScoped<IAzureDevOpsService, AzureDevOpsService>();
             services.AddScoped<IDatabasePortalService, DatabasePortalService>();
         }
 
