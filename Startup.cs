@@ -30,7 +30,6 @@ namespace DSM.UI.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddCors();
             services.AddControllers();
             services.AddDbContext<DSMAuthDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DSMAuthServer")), ServiceLifetime.Transient);
@@ -89,6 +88,7 @@ namespace DSM.UI.Api
             services.AddScoped<IReportsService, ReportsService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IWebAccessLogService, WebAccessLogService>();
+            services.AddScoped<IDatabasePortalService, DatabasePortalService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
