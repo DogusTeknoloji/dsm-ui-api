@@ -13,7 +13,6 @@ namespace DSM.UI.Api.Services
         Task<IEnumerable<DbInventory>> GetEnvanterAllDBEnvanter(int page);
         Task<DbInventory> Details(int id);
         IEnumerable<SearchResult> Search(object term);
-        //public string GetServerCheckDate();
     }
 
     public class DatabasePortalService : IDatabasePortalService
@@ -33,9 +32,7 @@ namespace DSM.UI.Api.Services
         {
             return await _context.Dbinventory.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
-
-
-
+        
         public IEnumerable<SearchResult> Search(object term)
         {
             IEnumerable<PropertyInfo> stringProperties = typeof(DbInventory).GetProperties().Where(prop => prop.PropertyType == term.GetType());
@@ -57,13 +54,5 @@ namespace DSM.UI.Api.Services
 
             });
         }
-
-        //  public string GetServerCheckDate()
-        //  {
-        //      var query = from a in _context.VCenterLogs where a.LogName == "ServerInventory" select a.LogValue;
-        //      string checkDate = query.FirstOrDefault();
-        //      checkDate = Convert.ToDateTime(checkDate).ToString(CultureInfo.InvariantCulture);
-        //      return checkDate;
-        //  }
     }
 }
