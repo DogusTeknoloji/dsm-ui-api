@@ -3,6 +3,7 @@ using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace DSM.UI.Api.Controllers
 {
@@ -18,24 +19,24 @@ namespace DSM.UI.Api.Controllers
 
         [HttpGet("databases")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public IActionResult Databases(int page)
+        public async Task<IActionResult> Databases(int page)
         {
-            return Ok(_databasePortalService.GetEnvanterAllDBEnvanter(page));
+            return Ok(await _databasePortalService.GetEnvanterAllDBEnvanter(page));
         }
 
         [HttpGet("details")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             //1 SQL
             //2 Oracle
             //3 PostgreSQL
-            return Ok(_databasePortalService.Details(id));
+            return Ok(await _databasePortalService.Details(id));
         }
 
         [HttpGet("search")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public ActionResult Search(object term)
+        public ActionResult Search(string term)
         {
             return Ok(_databasePortalService.Search(term));
         }

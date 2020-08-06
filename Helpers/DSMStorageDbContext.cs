@@ -30,6 +30,127 @@ namespace DSM.UI.Api
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<DbInventory>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("DBInventory");
+
+                entity.Property(e => e.Aginstalled).HasColumnName("AGInstalled");
+
+                entity.Property(e => e.AktifPasif).HasMaxLength(255);
+
+                entity.Property(e => e.Asm).HasColumnName("ASM");
+
+                entity.Property(e => e.BackupAciklama).IsUnicode(false);
+
+                entity.Property(e => e.BackupHistory).IsUnicode(false);
+
+                entity.Property(e => e.BackupHistoryHata).IsUnicode(false);
+
+                entity.Property(e => e.BackupMonitoring)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BackupMonitoringHata).IsUnicode(false);
+
+                entity.Property(e => e.BackupPolicy).IsUnicode(false);
+
+                entity.Property(e => e.BackupPolicyHata).IsUnicode(false);
+
+                entity.Property(e => e.CollationType)
+                    .HasColumnName("Collation_Type")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ConnectionScript)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Cpuname)
+                    .HasColumnName("CPUName")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Dbsearch)
+                    .HasColumnName("DBSearch")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DbsearchHata)
+                    .HasColumnName("DBSearchHata")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Dbtype).HasColumnName("DBType");
+
+                entity.Property(e => e.DeleteDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).IsUnicode(false);
+
+                entity.Property(e => e.Domain).HasMaxLength(255);
+
+                entity.Property(e => e.EditionInstalled).IsUnicode(false);
+
+                entity.Property(e => e.Environment).HasMaxLength(255);
+
+                entity.Property(e => e.FileGroupMonitoring)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FileGroupMonitoringHata).IsUnicode(false);
+
+                entity.Property(e => e.FileMonitoring)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FileMonitoringHata).IsUnicode(false);
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Instance)
+                    .HasColumnName("instance")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IpAddress)
+                    .HasColumnName("IP_Address")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsClustered).IsUnicode(false);
+
+                entity.Property(e => e.JobMonitoring).IsUnicode(false);
+
+                entity.Property(e => e.JobMonitoringHata).IsUnicode(false);
+
+                entity.Property(e => e.Location).IsUnicode(false);
+
+                entity.Property(e => e.LogicalCpuCount).HasColumnName("Logical_CPU_Count");
+
+                entity.Property(e => e.MachineType).IsUnicode(false);
+
+                entity.Property(e => e.Osversion)
+                    .HasColumnName("OSVersion")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PhysicalCpuCount).HasColumnName("Physical_CPU_Count");
+
+                entity.Property(e => e.ProductBuildLevel).IsUnicode(false);
+
+                entity.Property(e => e.RecordDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ServerName).HasMaxLength(255);
+
+                entity.Property(e => e.ServiceName).HasColumnName("Service_Name");
+
+                entity.Property(e => e.Splevel)
+                    .HasColumnName("SPLevel")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Sqlbit)
+                    .HasColumnName("SQLBit")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Version).IsUnicode(false);
+            });
+
             modelBuilder.Entity<Site>(entity =>
             {
                 entity.ToTable("IISSite");
