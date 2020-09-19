@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DSM.UI.Api.Models.User
 {
-    public class User : IMappable<UpdateModel>, IMappable<RegisterModel>
+    public class User : IMappable<UpdateModel>, IMappable<RegisterModel>, IMappable<GetUserModel>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -41,6 +41,18 @@ namespace DSM.UI.Api.Models.User
             this.Username = item.Username;
             this.Password = item.Password;
             this.DomainId = item.DomainId;
+            return this;
+        }
+
+        public IMappable<GetUserModel> Map(GetUserModel item)
+        {
+            this.FullName = item.FullName;
+            this.Username = item.Username;
+            this.ProfileImage = item.ProfileImage;
+            this.DomainId = item.DomainId;
+            this.Enabled = item.Enabled;
+            this.Role = item.Role;
+            this.Id = item.Id;
             return this;
         }
     }
