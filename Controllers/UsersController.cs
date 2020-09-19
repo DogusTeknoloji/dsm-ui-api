@@ -23,11 +23,11 @@ namespace DSM.UI.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthenticateModel userParam)
+        public IActionResult Authenticate([FromBody] AuthenticateModel userParam)
         {
-            User user = null;
-
-            DomainUserHolder holder = LDAPAuthService.ValidateUser(userParam.Username, userParam.Password, this._userService);
+            GetUserModel user = null;
+            string message = "";
+            DomainUserHolder holder = LDAPAuthService.ValidateUser(userParam.Username, userParam.Password, this._userService, out message);
 
             DomainUserInfo domainUser = holder?.DomainUser;
 
@@ -39,14 +39,17 @@ namespace DSM.UI.Api.Controllers
                     RegisterModel model = MapHelper.Map<RegisterModel, DomainUserInfo>(holder.DomainUser);
                     _ = this.Register(model);
 
-                    user = _userService.GetByUserName(userParam.Username);
+                    user = MapHelper.Map<GetUserModel, User>(_userService.GetByUserName(userParam.Username));
                     if (user == null) return StatusCode(500, new { message = "LDAP Register failed." });
                 }
                 else
                 {
                     user = holder.User;
-                    user.ProfileImage = holder.DomainUser.ProfileImage;
                 }
+            }
+            else if (message.ToLower() != "success")
+            {
+                return BadRequest(new { message = message });
             }
             else
             {
@@ -55,7 +58,8 @@ namespace DSM.UI.Api.Controllers
                     return BadRequest(new { message = "Password is Required" });
                 }
 
-                user = _userService.Authenticate(userParam.Username, userParam.Password);
+                User xUser = _userService.Authenticate(userParam.Username, userParam.Password);
+                user = MapHelper.Map<GetUserModel, User>(xUser);
 
                 if (user == null)
                 {
@@ -75,9 +79,24 @@ namespace DSM.UI.Api.Controllers
                 user.Id,
                 user.Username,
                 user.FullName,
+                user.AccountCreateDate,
+                user.Company,
+                user.DateOfHire,
+                user.Department,
+                user.EmployeeId,
+                user.LastLogonTime,
+                user.Location,
+                user.LogonCount,
+                user.MailNickName,
+                user.MobilePhone,
+                user.OfficeName,
+                user.PasswordLastSet,
+                user.SamAccountName,
+                user.Title,
                 Role = user.Role?.Name,
                 Token = tokenString,
                 ProfilePhoto = user.ProfileImage,
+
                 IsAdUser = domainUser != null
             });
         }
@@ -86,16 +105,16 @@ namespace DSM.UI.Api.Controllers
         [HttpPost("authenticateldap")]
         public IActionResult AuthenticateLDAP()
         {
-            User user = null;
+            GetUserModel user = null;
             DomainUserInfo domainUser = LDAPAuthService.GetCurrentUser();
             if (domainUser == null) return StatusCode(401, new { message = "LDAP Auth failed." });
-            user = this._userService.GetByUserName(domainUser.Username);
+            user = MapHelper.Map<GetUserModel, User>(this._userService.GetByUserName(domainUser.Username));
             if (user == null)
             {
                 RegisterModel model = MapHelper.Map<RegisterModel, DomainUserInfo>(domainUser);
                 _ = this.Register(model);
 
-                user = this._userService.GetByUserName(domainUser.Username);
+                user = MapHelper.Map<GetUserModel, User>(this._userService.GetByUserName(domainUser.Username));
                 if (user == null) return StatusCode(500, new { message = "LDAP Register failed." });
             }
             string tokenString = AuthenticationHelper.GetToken(user, this._appSettings.Secret);
@@ -114,7 +133,7 @@ namespace DSM.UI.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody]RegisterModel model)
+        public IActionResult Register([FromBody] RegisterModel model)
         {
             var user = MapHelper.Map<User, RegisterModel>(model);
             user.Id = 0;
@@ -161,7 +180,7 @@ namespace DSM.UI.Api.Controllers
 
         [HttpPost("update/{username}")]
         [Authorize(Roles = "Administrator, CIFANG")]
-        public IActionResult Update(string username, [FromBody]UpdateModel model)
+        public IActionResult Update(string username, [FromBody] UpdateModel model)
         {
             var user = MapHelper.Map<User, UpdateModel>(model);
             user.Username = username;

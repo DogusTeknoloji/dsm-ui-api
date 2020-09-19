@@ -7,7 +7,7 @@ namespace DSM.UI.Api.Models.User
 {
     public class DomainUserHolder
     {
-        public User User { get; set; }
+        public GetUserModel User { get; set; }
         public DomainUserInfo DomainUser { get; set; }
     }
 }

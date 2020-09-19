@@ -10,7 +10,7 @@ namespace DSM.UI.Api.Helpers
 {
     public static class AuthenticationHelper
     {
-        public static string GetToken(User user, string secret)
+        public static string GetToken(GetUserModel user, string secret)
         {
             Dictionary<string, object> claims = new Dictionary<string, object>
             {
