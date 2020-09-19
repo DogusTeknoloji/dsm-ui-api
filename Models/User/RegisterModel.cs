@@ -32,7 +32,6 @@ namespace DSM.UI.Api.Models.User
         {
             this.FullName = item.FullName;
             this.Username = item.Username;
-            this.Password = item.Password;
             this.DomainId = item.DomainId;
             this.ProfilePhoto = item.ProfileImage;
             return this;
