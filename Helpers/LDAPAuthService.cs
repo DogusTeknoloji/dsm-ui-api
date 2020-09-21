@@ -6,6 +6,7 @@ using System.Data;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.Protocols;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -31,11 +32,11 @@ namespace DSM.UI.Api.Helpers
                 return null;
             }
 
-            const long UNIT = 864000000000;
+            const double UNIT = 864000000000;
             long EPOCH = long.Parse(epochtime);
             DateTime adDate = new DateTime(1601, 1, 1).AddDays(EPOCH / UNIT);
 
-            return adDate.ToString();
+            return adDate.ToString(CultureInfo.InvariantCulture);
         }
         private static string GetSamAccountNameByEMail(string domain, string email)
         {
