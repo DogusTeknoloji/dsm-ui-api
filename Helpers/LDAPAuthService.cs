@@ -261,14 +261,13 @@ namespace DSM.UI.Api.Helpers
         public static DomainUserHolder ValidateUser(string username, string password, IUserService service, out string message)
         {
             DomainUserHolder holder = new DomainUserHolder();
-            string dbusername = username.Split('@').FirstOrDefault();
-            User user = service.GetByUserName(dbusername);
+
             //if format is valid for LDAP domains.
             message = "Success";
             if (!Regex.IsMatch(username, MAILREGEXPATTERN)) return null;
 
             // if exists, use user's previously saved domain info otherwise get all domains to find valid domain.
-            List<Domain> ldapDomains = user == null ? service.GetDomainList() : new List<Domain> { user.Domain };
+            List<Domain> ldapDomains = service.GetDomainList();
 
             string domainName = GetDomainNameFromUsername(username);
             // Create new minified list by which item contains contosodomain in domainlist
@@ -276,6 +275,7 @@ namespace DSM.UI.Api.Helpers
             // Validate user in domains in the list, if found return domain id else return -1
             holder.DomainUser = AuthenticateActiveDirectory(ldapDomains, username, password, out message);
 
+            User user = service.GetByUserName(holder.DomainUser.SamAccountName);
             holder.User = MapHelper.Map<GetUserModel, DomainUserInfo>(holder.DomainUser);
 
             if (user == null)
