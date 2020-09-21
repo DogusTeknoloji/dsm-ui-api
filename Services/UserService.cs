@@ -51,31 +51,34 @@ namespace DSM.UI.Api.Services
         {
             return _context.Users.SingleOrDefault(x => x.Username == userName);
         }
-
+        object lockObj = "LOCK";
         public User Create(User user, string password)
         {
-            if (string.IsNullOrWhiteSpace(password))
-                return null;
+            lock (lockObj)
+            {
+                if (string.IsNullOrWhiteSpace(password))
+                    return null;
 
-            if (_context.Users.Any(x => x.Username == user.Username))
-                return null;
+                if (_context.Users.Any(x => x.Username == user.Username))
+                    return null;
 
-            user.LastLogin = new DateTime(2000, 01, 01);
-            user.LastAttempt = new DateTime(2000, 01, 01);
-            user.RoleId = 1;
-            user.Role = _context.Roles.SingleOrDefault(x => x.Name == "Member");
+                user.LastLogin = new DateTime(2000, 01, 01);
+                user.LastAttempt = new DateTime(2000, 01, 01);
+                user.RoleId = 1;
+                user.Role = _context.Roles.SingleOrDefault(x => x.Name == "Member");
 
-            byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
-            user.Password = null;
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
+                user.Password = null;
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
+                _context.Users.Add(user);
+                _context.SaveChanges();
 
-            return user;
+                return user; 
+            }
         }
 
         public void Update(User userParam)

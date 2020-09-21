@@ -8,6 +8,8 @@ namespace DSM.UI.Api.Helpers.JwtHelpers
     public class DecodedTokenStruct
     {
         public string Username { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
         public string Userrole { get; set; }
         public DateTime? ValidFrom { get; set; }
         public DateTime? ValidTo { get; set; }

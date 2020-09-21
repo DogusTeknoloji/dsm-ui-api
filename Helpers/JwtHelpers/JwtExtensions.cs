@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using DSM.UI.Api.Models.User;
@@ -42,18 +43,19 @@ namespace DSM.UI.Api.Helpers.JwtHelpers
             {
                 return decodedToken;
             }
+            object tempvalue;
+            tokenObj.Payload.TryGetValue("unique_name", out tempvalue);
+            decodedToken.FullName = tempvalue?.ToString();
 
-            var userClaim = tokenObj.Claims.ToArray()[0];
-            if (userClaim != null)
-            {
-                decodedToken.Username = userClaim.Value;
-            }
+            tokenObj.Payload.TryGetValue("role", out tempvalue);
+            decodedToken.Userrole = tempvalue?.ToString();
 
-            var roleClaim = tokenObj.Claims.ToArray()[1];
-            if (roleClaim != null)
-            {
-                decodedToken.Userrole = roleClaim.Value;
-            }
+            tokenObj.Payload.TryGetValue("email", out tempvalue);
+            decodedToken.Email = tempvalue?.ToString();
+
+            tokenObj.Payload.TryGetValue("winaccountname", out tempvalue);
+            decodedToken.Username = tempvalue?.ToString();
+
             decodedToken.ValidFrom = tokenObj.ValidFrom;
             decodedToken.ValidTo = tokenObj.ValidTo;
             decodedToken.Issuer = tokenObj.Issuer;
