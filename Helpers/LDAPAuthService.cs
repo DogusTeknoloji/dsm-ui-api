@@ -51,6 +51,12 @@ namespace DSM.UI.Api.Helpers
                 adSearch.Filter = "name=" + username;
                 result = adSearch.FindOne();
             }
+            else if (result == null)
+            {
+                string username = email.Split('@').FirstOrDefault();
+                adSearch.Filter = "samaccountname=" + username;
+                result = adSearch.FindOne();
+            }
 
             ResultPropertyCollection rpc = result.Properties;
             string samAccountName = rpc["samaccountname"][0].ToString();
