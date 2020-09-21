@@ -51,7 +51,8 @@ namespace DSM.UI.Api.Helpers
                 adSearch.Filter = "name=" + username;
                 result = adSearch.FindOne();
             }
-            else if (result == null)
+            
+            if (result == null)
             {
                 string username = email.Split('@').FirstOrDefault();
                 adSearch.Filter = "samaccountname=" + username;
