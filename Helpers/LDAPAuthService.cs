@@ -6,6 +6,7 @@ using System.Data;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.Protocols;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -23,6 +24,38 @@ namespace DSM.UI.Api.Helpers
             // Split by '.' and take first part of string; So contosodomain.com -> contosodomain
             domainName = domainName.Split('.')[0];
             return domainName;
+        }
+        private static string ConvertAdEpochTimeToDate(string epochtime)
+        {
+            if (string.IsNullOrEmpty(epochtime))
+            {
+                return null;
+            }
+
+            const double UNIT = 864000000000;
+            long EPOCH = long.Parse(epochtime);
+            DateTime adDate = new DateTime(1601, 1, 1).AddDays(EPOCH / UNIT);
+
+            return adDate.ToString(CultureInfo.InvariantCulture);
+        }
+        private static string GetSamAccountNameByEMail(string domain, string email)
+        {
+            DirectoryEntry adEntry = new DirectoryEntry("LDAP://" + domain);
+            DirectorySearcher adSearch = new DirectorySearcher(adEntry);
+            adSearch.Filter = "mail=" + email;
+            SearchResult result = adSearch.FindOne();
+
+            if (result == null)
+            {
+                string username = email.Split('@').FirstOrDefault();
+                adSearch.Filter = "name=" + username;
+                result = adSearch.FindOne();
+            }
+
+            ResultPropertyCollection rpc = result.Properties;
+            string samAccountName = rpc["samaccountname"][0].ToString();
+
+            return samAccountName;
         }
         private static Dictionary<string, string> GetUserInfoAll(Domain domain, string userName)
         {
@@ -46,24 +79,58 @@ namespace DSM.UI.Api.Helpers
         {
             Dictionary<string, string> userInfoDict = GetUserInfoAll(domain, userName);
 
-            DomainUserInfo userInfo = new DomainUserInfo
+            DomainUserInfo userInfo = new DomainUserInfo();
+            string tempResult = null, tempResult2 = null;
+
+            userInfoDict.TryGetValue(UserProperties.USER_CREATE_DATE, out tempResult);
+            userInfo.AccountCreateDate = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_COMPANY, out tempResult);
+            userInfo.Company = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_DATE_OF_HIRE, out tempResult);
+            userInfo.DateOfHire = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_DEPARTMENT, out tempResult);
+            userInfo.Department = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_EMPLOYEE_ID, out tempResult);
+            userInfo.EmployeeId = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_NAME, out tempResult);
+            userInfoDict.TryGetValue(UserProperties.USER_SURNAME, out tempResult2);
+            userInfo.FullName = $"{tempResult} {tempResult2}";
+
+            userInfoDict.TryGetValue(UserProperties.USER_LAST_LOGON_TIME, out tempResult);
+            userInfo.LastLogonTime = ConvertAdEpochTimeToDate(tempResult);
+
+            userInfoDict.TryGetValue(UserProperties.USER_LOCATION, out tempResult);
+            userInfo.Location = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_LOGON_COUNT, out tempResult);
+            userInfo.LogonCount = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_MAIL_NICK_NAME, out tempResult);
+            userInfo.MailNickName = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_MOBILE_PHONE, out tempResult);
+            if (string.IsNullOrEmpty(tempResult))
             {
-                AccountCreateDate = userInfoDict[UserProperties.USER_CREATE_DATE],
-                Company = userInfoDict[UserProperties.USER_COMPANY],
-                DateOfHire = userInfoDict[UserProperties.USER_DATE_OF_HIRE],
-                Department = userInfoDict[UserProperties.USER_DEPARTMENT],
-                EmployeeId = userInfoDict[UserProperties.USER_EMPLOYEE_ID],
-                FullName = $"{userInfoDict[UserProperties.USER_NAME]} {userInfoDict[UserProperties.USER_SURNAME]}",
-                LastLogonTime = userInfoDict[UserProperties.USER_LAST_LOGON_TIME],
-                Location = userInfoDict[UserProperties.USER_LOCATION],
-                LogonCount = userInfoDict[UserProperties.USER_LOGON_COUNT],
-                MailNickName = userInfoDict[UserProperties.USER_MAIL_NICK_NAME],
-                MobilePhone = userInfoDict[UserProperties.USER_MOBILE_PHONE],
-                OfficeName = userInfoDict[UserProperties.USER_OFFICE_NAME],
-                PasswordLastSet = userInfoDict[UserProperties.USER_PASSWORD_LAST_SET],
-                SamAccountName = userInfoDict[UserProperties.USER_SAM_ACCOUNT_NAME],
-                Title = userInfoDict[UserProperties.USER_TITLE]
-            };
+                userInfoDict.TryGetValue(UserProperties.USER_MOBILE_PHONE_V2, out tempResult);
+            }
+            userInfo.MobilePhone = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_OFFICE_NAME, out tempResult);
+            userInfo.OfficeName = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_PASSWORD_LAST_SET, out tempResult);
+            userInfo.PasswordLastSet = ConvertAdEpochTimeToDate(tempResult);
+
+            userInfoDict.TryGetValue(UserProperties.USER_SAM_ACCOUNT_NAME, out tempResult);
+            userInfo.SamAccountName = tempResult;
+
+            userInfoDict.TryGetValue(UserProperties.USER_TITLE, out tempResult);
+            userInfo.Title = tempResult;
 
             return userInfo;
         }
@@ -127,6 +194,8 @@ namespace DSM.UI.Api.Helpers
                 {
                     try
                     {
+                        UserName = GetSamAccountNameByEMail(domain.DomainName, UserName);
+
                         LdapConnection ldapConnection = new LdapConnection(domain.DomainName);
                         NetworkCredential credentials = new NetworkCredential(UserName, Password);
                         ldapConnection.Credential = credentials;
@@ -218,6 +287,7 @@ namespace DSM.UI.Api.Helpers
             public const string USER_TITLE = "title";
             public const string USER_DEPARTMENT = "department";
             public const string USER_MOBILE_PHONE = "mobile";
+            public const string USER_MOBILE_PHONE_V2 = "kymmobilephone";
             public const string USER_COMPANY = "company";
             public const string USER_SAM_ACCOUNT_NAME = "samaccountname";
             public const string USER_MAIL_NICK_NAME = "mailnickname";
