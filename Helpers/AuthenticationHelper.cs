@@ -12,6 +12,8 @@ namespace DSM.UI.Api.Helpers
     {
         public static string GetToken(GetUserModel user, string secret)
         {
+            user.MobilePhone = user.MobilePhone ?? "";
+
             Dictionary<string, object> claims = new Dictionary<string, object>
             {
                 { ClaimTypes.Name, user.Username },
