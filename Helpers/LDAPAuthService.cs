@@ -110,8 +110,9 @@ namespace DSM.UI.Api.Helpers
             userInfoDict.TryGetValue(UserProperties.USER_LOGON_COUNT, out tempResult);
             userInfo.LogonCount = tempResult;
 
-            userInfoDict.TryGetValue(UserProperties.USER_MAIL_NICK_NAME, out tempResult);
-            userInfo.MailNickName = tempResult;
+            userInfoDict.TryGetValue(UserProperties.USER_MAIL, out tempResult);
+            userInfo.MailAddress = tempResult;
+
 
             userInfoDict.TryGetValue(UserProperties.USER_MOBILE_PHONE, out tempResult);
             if (string.IsNullOrEmpty(tempResult))
@@ -260,7 +261,8 @@ namespace DSM.UI.Api.Helpers
         public static DomainUserHolder ValidateUser(string username, string password, IUserService service, out string message)
         {
             DomainUserHolder holder = new DomainUserHolder();
-            User user = service.GetByUserName(username);
+            string dbusername = username.Split('@').FirstOrDefault();
+            User user = service.GetByUserName(dbusername);
             //if format is valid for LDAP domains.
             message = "Success";
             if (!Regex.IsMatch(username, MAILREGEXPATTERN)) return null;
@@ -275,8 +277,19 @@ namespace DSM.UI.Api.Helpers
             holder.DomainUser = AuthenticateActiveDirectory(ldapDomains, username, password, out message);
 
             holder.User = MapHelper.Map<GetUserModel, DomainUserInfo>(holder.DomainUser);
+
+            if (user == null)
+            {
+                holder.User = null;
+                return holder;
+            }
+
             holder.User.Id = user.Id;
             holder.User.Role = user.Role;
+            if (string.IsNullOrEmpty(holder.User.MailAddress))
+            {
+                holder.User.MailAddress = username;
+            }
 
             return holder;
         }
@@ -302,6 +315,7 @@ namespace DSM.UI.Api.Helpers
             public const string USER_EMPLOYEE_ID = "employeeid";
             public const string USER_DISPLAY_NAME = "kymdisplayname";
             public const string USER_DATE_OF_HIRE = "kymdateofhire";
+            public const string USER_MAIL = "mail";
         }
         private struct LDAPErrorCode
         {

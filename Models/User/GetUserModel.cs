@@ -10,7 +10,7 @@ namespace DSM.UI.Api.Models.User
         public string MobilePhone { get; set; }
         public string Company { get; set; }
         public string SamAccountName { get; set; }
-        public string MailNickName { get; set; }
+        public string MailAddress { get; set; }
         public string AccountCreateDate { get; set; }
         public string PasswordLastSet { get; set; }
         public string LastLogonTime { get; set; }
@@ -40,7 +40,7 @@ namespace DSM.UI.Api.Models.User
             this.LastLogonTime = item?.LastLogonTime;
             this.Location = item?.Location;
             this.LogonCount = item?.LogonCount;
-            this.MailNickName = item?.MailNickName;
+            this.MailAddress = item?.MailAddress;
             this.MobilePhone = item?.MobilePhone;
             this.OfficeName = item?.OfficeName;
             this.PasswordLastSet = item?.PasswordLastSet;

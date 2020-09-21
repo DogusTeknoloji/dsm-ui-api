@@ -248,7 +248,7 @@ namespace DSM.UI.Api.Services
             IEnumerable<SearchResult> results = null;
             if (term == null)
             {
-                var query = this._context.Servers;
+                var query = _context.Servers;
                 results = query.ToList().Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,

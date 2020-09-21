@@ -14,8 +14,11 @@ namespace DSM.UI.Api.Helpers
         {
             Dictionary<string, object> claims = new Dictionary<string, object>
             {
-                { ClaimTypes.Name, user.FullName },
-                { ClaimTypes.Actor, user.Username },
+                { ClaimTypes.Name, user.Username },
+                { ClaimTypes.Actor, user.FullName },
+                { ClaimTypes.Email, user.MailAddress },
+                { ClaimTypes.MobilePhone, user.MobilePhone },
+                { ClaimTypes.WindowsAccountName, user.SamAccountName },
                 { ClaimTypes.Role, user.Role.Name }
             };
 
@@ -25,14 +28,18 @@ namespace DSM.UI.Api.Helpers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name, user.Username.ToString()),
+                    new Claim(ClaimTypes.Name, user.Username),
                     new Claim(ClaimTypes.Role, user.Role.Name),
+                    new Claim(ClaimTypes.Actor, user.FullName),
+                    new Claim(ClaimTypes.Email,user.MailAddress),
+                    new Claim(ClaimTypes.MobilePhone,user.MobilePhone),
+                    new Claim(ClaimTypes.WindowsAccountName,user.SamAccountName)
                 }),
                 Expires = DateTime.UtcNow.AddHours(24),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Claims = claims,
                 Issuer = "Doğuş Teknoloji",
-                Audience = "DT Users",
+                Audience = user.Company,
                 IssuedAt = DateTime.UtcNow
             };
 

@@ -37,9 +37,12 @@ namespace DSM.UI.Api.Controllers
                 if (holder.User == null)
                 {
                     RegisterModel model = MapHelper.Map<RegisterModel, DomainUserInfo>(holder.DomainUser);
+                    model.Password = "DOMAIN";
                     _ = this.Register(model);
 
-                    user = MapHelper.Map<GetUserModel, User>(_userService.GetByUserName(userParam.Username));
+                    holder = LDAPAuthService.ValidateUser(userParam.Username, userParam.Password, this._userService, out message);
+                    user = holder.User;
+
                     if (user == null) return StatusCode(500, new { message = "LDAP Register failed." });
                 }
                 else
@@ -87,7 +90,7 @@ namespace DSM.UI.Api.Controllers
                 user.LastLogonTime,
                 user.Location,
                 user.LogonCount,
-                user.MailNickName,
+                user.MailAddress,
                 user.MobilePhone,
                 user.OfficeName,
                 user.PasswordLastSet,
