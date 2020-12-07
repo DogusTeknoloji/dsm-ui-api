@@ -282,7 +282,7 @@ namespace DSM.UI.Api.Helpers
             // Validate user in domains in the list, if found return domain id else return -1
             holder.DomainUser = AuthenticateActiveDirectory(ldapDomains, username, password, out message);
 
-            User user = service.GetByUserName(holder.DomainUser.SamAccountName);
+            User user = service.GetByUserName(holder.DomainUser?.SamAccountName);
             holder.User = MapHelper.Map<GetUserModel, DomainUserInfo>(holder.DomainUser);
 
             if (user == null)
