@@ -12,7 +12,9 @@ namespace DSM.UI.Api.Helpers
     {
         public static string GetToken(GetUserModel user, string secret)
         {
-            user.MobilePhone = user.MobilePhone ?? "";
+            user.MobilePhone ??= "";
+            user.MailAddress ??= "";
+            user.SamAccountName ??= "";
 
             Dictionary<string, object> claims = new Dictionary<string, object>
             {
