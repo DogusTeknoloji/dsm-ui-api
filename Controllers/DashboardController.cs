@@ -36,7 +36,6 @@ namespace DSM.UI.Api.Controllers
             return Ok(inventoryItems.OrderBy(x => x.Description));
         }
 
-
         [HttpGet("dashboard")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult GetDashboard()
