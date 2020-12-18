@@ -27,6 +27,16 @@ namespace DSM.UI.Api.Controllers
             return Ok(links.OrderBy(x => x.Description));
         }
 
+        [HttpGet("elastic-search-inventory/")]
+        [Authorize(Roles = "Administrator, CIFANG")]
+        public IActionResult GetElasticSearchInventory()
+        {
+            var inventoryItems = this._dashboardService.GetElasticSearchInventory();
+            if (inventoryItems == null) return BadRequest(InvalidOperationError.GetInstance());
+            return Ok(inventoryItems.OrderBy(x => x.Description));
+        }
+
+
         [HttpGet("dashboard")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult GetDashboard()

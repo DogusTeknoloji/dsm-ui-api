@@ -301,6 +301,12 @@ namespace DSM.UI.Api
                 entity.HasKey("AppId");
             });
 
+            modelBuilder.Entity<ElasticSearchInventoryItem>(entity =>
+            {
+                entity.ToTable("ElasticSearchInventory");
+                entity.HasKey("AppId");
+            });
+
             modelBuilder.Entity<VCenterLog>(entity =>
             {
                 entity.ToTable("VCenterLogs");
@@ -322,6 +328,7 @@ namespace DSM.UI.Api
         public DbSet<ServerDisk> ServerDisks { get; set; }
         public DbSet<ScheduledJobItem> ScheduledJobItems { get; set; }
         public DbSet<AppManagementLink> AppManagementLinks { get; set; }
+        public DbSet<ElasticSearchInventoryItem> ElasticSearchInventory { get; set; }
         public DbSet<VCenterLog> VCenterLogs { get; set; }
         public DbSet<DbInventory> Dbinventory { get; set; }
     }
