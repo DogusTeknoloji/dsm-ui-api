@@ -30,6 +30,7 @@ namespace DSM.UI.Api.Models.Server
         public string Cluster { get; set; }
         public string Notes { get; set; }
         public int CompanyId { get; set; }
+        public string OdmReplication { get; set; }
         [Column("Service")]
         public string ServiceName { get; set; }
         public virtual Company.Company Company { get; set; }
