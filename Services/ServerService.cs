@@ -71,6 +71,7 @@ namespace DSM.UI.Api.Services
                 PhysicalLocation = result.PhysicalLocation,
                 Responsible = result.Responsible,
                 ServerType = result.ServerType,
+                ODMReplication = result.OdmReplication,
                 ServiceName = result.ServiceName,
                 ToolsRunningStatus = result.ToolsRunningStatus,
                 OnlineSiteCount = siteCount == 0 ? "0" : comingSoon,

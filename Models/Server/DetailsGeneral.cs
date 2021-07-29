@@ -21,6 +21,7 @@ namespace DSM.UI.Api.Models.Server
         public string MemoryUsage { get; set; }
         public string ToolsRunningStatus { get; set; }
         public string ServiceName { get; set; }
+        public string ODMReplication { get; set; }
         public string Notes { get; set; }
         public string SiteCount { get; set; }
         public string OnlineSiteCount { get; set; }
