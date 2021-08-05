@@ -17,8 +17,6 @@ namespace DSM.UI.Api.Services
         byte[] DownloadScheduledJobList();
         byte[] DownloadScheduledJobList(object term);
         IEnumerable<ODMItem> GetODMItems(int pagenumber);
-
-
     }
     public class ReportsService : IReportsService
     {
@@ -196,7 +194,6 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term)
         {
-            ;
             IEnumerable<PropertyInfo> stringProperties = typeof(ScheduledJobItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.ScheduledJobItems select a;
@@ -297,7 +294,6 @@ namespace DSM.UI.Api.Services
                         Service = x.ServiceName
                     }).AsEnumerable();
                 return query.Distinct();
-
             }
         }
     }

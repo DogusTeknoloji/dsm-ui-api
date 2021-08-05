@@ -137,8 +137,7 @@ namespace DSM.UI.Api.Controllers
             var ODMStatusList = this._reportsService.GetODMItems(pagenumber);
             if (ODMStatusList == null) return BadRequest(InvalidOperationError.GetInstance());
 
-            return this.Ok(ODMStatusList);
-            
+            return this.Ok(ODMStatusList); 
         }
     }
 }
