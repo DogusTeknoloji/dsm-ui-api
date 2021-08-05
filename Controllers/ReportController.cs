@@ -129,5 +129,16 @@ namespace DSM.UI.Api.Controllers
             Response.Headers.Add("Content-Disposition", cd.ToString());
             return File(exportData, "application/octet-stream");
         }
+
+        [HttpGet("odmstatusreport/{pagenumber}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetODMStatusReport(int pagenumber)
+        {
+            var ODMStatusList = this._reportsService.GetODMItems(pagenumber);
+            if (ODMStatusList == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            return this.Ok(ODMStatusList);
+            
+        }
     }
 }
