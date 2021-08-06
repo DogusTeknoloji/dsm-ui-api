@@ -17,6 +17,9 @@ namespace DSM.UI.Api.Services
         byte[] DownloadScheduledJobList();
         byte[] DownloadScheduledJobList(object term);
         IEnumerable<ODMItem> GetODMItems(int pagenumber);
+        IEnumerable<SearchODMItemResult> GetSearchODMItems(object term);
+        byte[] DownloadODMItems();
+        byte[] DownloadODMItems(object term);
     }
     public class ReportsService : IReportsService
     {
@@ -262,39 +265,120 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<ODMItem> GetODMItems(int pagenumber)
         {
+            var query = from site in this._context.Sites
+                        join server in this._context.Servers
+                            on site.MachineName equals server.ServerName
+                        select new ODMItem
+                        {
+                            SiteName = site.Name,
+                            ServerName = server.ServerName,
+                            DnsName = server.HostName,
+                            IpAddress = server.IpAddress,
+                            OdmStatus = server.OdmReplication,
+                            OperatingSystem = server.OperatingSystem,
+                            Responsible = server.Responsible,
+                            Service = server.ServiceName,
+                        };
+
             if (pagenumber < 2)
             {
-                var query = this._context.Servers
-                    .Take(_pageItemCount)
-                    .Select(x => new ODMItem
-                    {
-                        ServerName = x.ServerName,
-                        DnsName = x.HostName,
-                        IpAddress = x.IpAddress,
-                        OdmStatus = x.OdmReplication,
-                        OperatingSystem = x.OperatingSystem,
-                        Responsible = x.Responsible,
-                        Service = x.ServiceName
-                    }).AsEnumerable();
-                return query.Distinct();
+                return query.Take(_pageItemCount).AsEnumerable().Distinct();
             }
             else
             {
-                var query = this._context.Servers
-                    .Skip((pagenumber - 1) * _pageItemCount)
-                    .Take(_pageItemCount)
-                    .Select(x => new ODMItem
-                    {
-                        ServerName = x.ServerName,
-                        DnsName = x.HostName,
-                        IpAddress = x.IpAddress,
-                        OdmStatus = x.OdmReplication,
-                        OperatingSystem = x.OperatingSystem,
-                        Responsible = x.Responsible,
-                        Service = x.ServiceName
-                    }).AsEnumerable();
-                return query.Distinct();
+                return query.Skip((pagenumber - 1) * _pageItemCount).Take(_pageItemCount).AsEnumerable().Distinct();
             }
+        }
+
+        public IEnumerable<SearchODMItemResult> GetSearchODMItems(object term)
+        {
+            IEnumerable<PropertyInfo> stringProperties = typeof(ODMItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+
+            var query = from site in this._context.Sites
+                        join server in this._context.Servers on site.MachineName equals server.ServerName
+                        select new ODMItem
+                        {
+                            SiteName = site.Name,
+                            ServerName = server.ServerName,
+                            DnsName = server.HostName,
+                            IpAddress = server.IpAddress,
+                            OdmStatus = server.OdmReplication,
+                            OperatingSystem = server.OperatingSystem,
+                            Responsible = server.Responsible,
+                            Service = server.ServiceName,
+                        };
+            query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
+            var results = query.ToList();
+
+            return results.Select(x => new SearchODMItemResult
+            {
+                DnsName = x.DnsName,
+                IpAddress = x.IpAddress,
+                OdmStatus = x.OdmStatus,
+                OperatingSystem = x.OperatingSystem,
+                Responsible = x.Responsible,
+                ServerName = x.ServerName,
+                Service = x.Service,
+                SiteName = x.SiteName
+            });
+        }
+
+        public byte[] DownloadODMItems()
+        {
+            return this.DownloadODMItems(null);
+        }
+
+        public byte[] DownloadODMItems(object term)
+        {
+            IEnumerable<SearchODMItemResult> results = null;
+            var query = from site in this._context.Sites
+                        join server in this._context.Servers on site.MachineName equals server.ServerName
+                        select new ODMItem
+                        {
+                            SiteName = site.Name,
+                            ServerName = server.ServerName,
+                            DnsName = server.HostName,
+                            IpAddress = server.IpAddress,
+                            OdmStatus = server.OdmReplication,
+                            OperatingSystem = server.OperatingSystem,
+                            Responsible = server.Responsible,
+                            Service = server.ServiceName,
+                        };
+
+            if (term == null)
+            {
+                results = query.ToList().Select(x => new SearchODMItemResult
+                {
+                    DnsName = x.DnsName,
+                    IpAddress = x.IpAddress,
+                    OdmStatus = x.OdmStatus,
+                    OperatingSystem = x.OperatingSystem,
+                    Responsible = x.Responsible,
+                    ServerName = x.ServerName,
+                    Service = x.Service,
+                    SiteName = x.SiteName
+                });
+            }
+            else
+            {
+                IEnumerable<PropertyInfo> stringProperties = typeof(ODMItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+
+                query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
+
+                results = query.ToList().Select(x => new SearchODMItemResult
+                {
+                    DnsName = x.DnsName,
+                    IpAddress = x.IpAddress,
+                    OdmStatus = x.OdmStatus,
+                    OperatingSystem = x.OperatingSystem,
+                    Responsible = x.Responsible,
+                    ServerName = x.ServerName,
+                    Service = x.Service,
+                    SiteName = x.SiteName
+                });
+            }
+
+            return ExcelOperations.ExportToExcel(results);
         }
     }
 }

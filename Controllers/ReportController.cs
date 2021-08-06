@@ -139,5 +139,36 @@ namespace DSM.UI.Api.Controllers
 
             return this.Ok(ODMStatusList); 
         }
+
+        [HttpGet("odmstatusreport/search/{term}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult SearchODMStatusReport(string term)
+        {
+            var searchResults = this._reportsService.GetSearchODMItems(term);
+            if (searchResults == null)
+                return this.BadRequest(InvalidOperationError.GetInstance());
+
+            return Ok(searchResults);
+        }
+
+        [HttpGet("odmstatusreport/export/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportODMStatusReport()
+        {
+            var exportData = this._reportsService.DownloadODMItems();
+            if (exportData == null) return this.BadRequest(InvalidOperationError.GetInstance());
+
+            return File(exportData, "application/octet-stream");
+        }
+
+        [HttpGet("odmstatusreport/export/{term}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportODMStatusReport(string term)
+        {
+            var exportData = this._reportsService.DownloadODMItems(term);
+            if (exportData == null) return this.BadRequest(InvalidOperationError.GetInstance());
+
+            return File(exportData, "application/octet-stream");
+        }
     }
 }
