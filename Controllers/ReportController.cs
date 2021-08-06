@@ -172,12 +172,3 @@ namespace DSM.UI.Api.Controllers
         }
     }
 }
-
-
-/*
- {
-    "item": ""
- }
- 
-"emr
- */
