@@ -1,6 +1,6 @@
 ﻿namespace DSM.UI.Api.Models.Reports
 {
-    public class ODMItem
+    public class SearchODMItemResult
     {
         public string SiteName { get; set; }
         public string ServerName { get; set; }
