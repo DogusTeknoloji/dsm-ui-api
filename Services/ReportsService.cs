@@ -16,7 +16,7 @@ namespace DSM.UI.Api.Services
         IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term);
         byte[] DownloadScheduledJobList();
         byte[] DownloadScheduledJobList(object term);
-
+        IEnumerable<ODMItem> GetODMItems(int pagenumber);
     }
     public class ReportsService : IReportsService
     {
@@ -193,7 +193,7 @@ namespace DSM.UI.Api.Services
         }
 
         public IEnumerable<ScheduledJobListDTO> SearchScheduledJobList(object term)
-        {;
+        {
             IEnumerable<PropertyInfo> stringProperties = typeof(ScheduledJobItem).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
             var query = from a in _context.ScheduledJobItems select a;
@@ -258,6 +258,43 @@ namespace DSM.UI.Api.Services
             }
 
             return ExcelOperations.ExportToExcel(results);
+        }
+
+        public IEnumerable<ODMItem> GetODMItems(int pagenumber)
+        {
+            if (pagenumber < 2)
+            {
+                var query = this._context.Servers
+                    .Take(_pageItemCount)
+                    .Select(x => new ODMItem
+                    {
+                        ServerName = x.ServerName,
+                        DnsName = x.HostName,
+                        IpAddress = x.IpAddress,
+                        OdmStatus = x.OdmReplication,
+                        OperatingSystem = x.OperatingSystem,
+                        Responsible = x.Responsible,
+                        Service = x.ServiceName
+                    }).AsEnumerable();
+                return query.Distinct();
+            }
+            else
+            {
+                var query = this._context.Servers
+                    .Skip((pagenumber - 1) * _pageItemCount)
+                    .Take(_pageItemCount)
+                    .Select(x => new ODMItem
+                    {
+                        ServerName = x.ServerName,
+                        DnsName = x.HostName,
+                        IpAddress = x.IpAddress,
+                        OdmStatus = x.OdmReplication,
+                        OperatingSystem = x.OperatingSystem,
+                        Responsible = x.Responsible,
+                        Service = x.ServiceName
+                    }).AsEnumerable();
+                return query.Distinct();
+            }
         }
     }
 }
