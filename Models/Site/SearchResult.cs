@@ -1,5 +1,6 @@
 ﻿using DSM.Core.Models;
 using DSM.UI.Api.Helpers;
+using System;
 
 namespace DSM.UI.Api.Models.Site
 {
@@ -15,6 +16,8 @@ namespace DSM.UI.Api.Models.Site
         public string PhysicalPath { get; set; }
         public string AppType { get; set; }
         public string AppPoolName { get; set; }
+        public DateTime DateLastUpdated { get; set; }
+        public DateTime DateDeleted { get; set; }
 
         public IMappable<Core.Models.Site> Map(Core.Models.Site item)
         {
@@ -25,6 +28,8 @@ namespace DSM.UI.Api.Models.Site
             this.SiteId = item.SiteId;
             this.AppType = item.AppType;
             this.AppPoolName = item.ApplicationPoolName;
+            this.DateLastUpdated = item.LastUpdated;
+            this.DateDeleted = item.DateDeleted;
             return this;
         }
     }
