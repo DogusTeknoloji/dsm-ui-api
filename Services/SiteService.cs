@@ -208,7 +208,7 @@ namespace DSM.UI.Api.Services
                     Port = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().Port,
                     SiteId = x.SiteId,
                     SiteName = x.Name
-                });
+                }).AsEnumerable().Where( x => x.DateDeleted <= DateTime.Parse("1900-01-01"));
                 return query;
             }
             else
@@ -225,7 +225,7 @@ namespace DSM.UI.Api.Services
                     Port = x.Bindings.FirstOrDefault() == null ? null : x.Bindings.FirstOrDefault().Port,
                     SiteId = x.SiteId,
                     SiteName = x.Name
-                });
+                }).AsEnumerable().Where(x => x.DateDeleted <= DateTime.Parse("1900-01-01"));
                 return query;
             }
         }
@@ -279,7 +279,8 @@ namespace DSM.UI.Api.Services
                     PhysicalPath = x.PhysicalPath,
                     Port = x.Bindings.FirstOrDefault()?.Port,
                     SiteId = x.SiteId,
-                    SiteName = x.Name
+                    SiteName = x.Name,
+                    DateLastUpdated = x.LastCheckTime
                 });
             }
             else
@@ -300,7 +301,8 @@ namespace DSM.UI.Api.Services
                     PhysicalPath = x.PhysicalPath,
                     Port = x.Bindings.FirstOrDefault()?.Port,
                     SiteId = x.SiteId,
-                    SiteName = x.Name
+                    SiteName = x.Name,
+                    DateLastUpdated = x.LastCheckTime
                 });
             }
 
