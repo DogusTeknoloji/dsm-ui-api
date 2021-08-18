@@ -119,7 +119,7 @@ namespace DSM.UI.Api.Services
             {
                 ServerId = server.ServerId,
                 ServerName = server.ServerName,
-                Availability = "Available",
+                Availability = server.PowerState.ToString(),
                 CompanyName = server.Company.Name,
                 CompanyId = server.Company.CompanyId
             };
