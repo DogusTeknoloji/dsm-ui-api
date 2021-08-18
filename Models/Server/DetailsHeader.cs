@@ -7,5 +7,6 @@
         public string ServerName { get; set; }
         public string CompanyName { get; set; }
         public string Availability { get; set; }
+        
     }
 }
