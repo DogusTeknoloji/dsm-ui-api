@@ -8,6 +8,7 @@ namespace DSM.UI.Api.Services
 {
     public interface IReportsService
     {
+        IEnumerable<KPIMetricsView> GetKpiItems(int pagenumber);
         IEnumerable<OverallDiskStatusItem> GetOverallDiskStatus(int pagenumber);
         IEnumerable<OverallDiskStatusItem> SearchOverallDiskStatus(object term);
         byte[] DownloadOverallDiskStatus();
@@ -379,6 +380,37 @@ namespace DSM.UI.Api.Services
             }
 
             return ExcelOperations.ExportToExcel(results);
+        }
+
+        public IEnumerable<KPIMetricsView> GetKpiItems(int pagenumber)
+        {
+            var query = from kpi in this._context.KPIMetricsViews
+                        select new KPIMetricsView
+                        {
+                            Application = kpi.Application,
+                            Year = kpi.Year,
+                            Ocak = kpi.Ocak,
+                            Subat = kpi.Subat,
+                            Mart = kpi.Mart,
+                            Nisan = kpi.Nisan,
+                            Mayis = kpi.Mayis,
+                            Haziran = kpi.Haziran,
+                            Temmuz = kpi.Temmuz,
+                            Agustos = kpi.Agustos,
+                            Eylul = kpi.Eylul,
+                            Ekim = kpi.Ekim,
+                            Kasim = kpi.Kasim,
+                            Aralik = kpi.Aralik
+                        };
+        
+            if (pagenumber < 2)
+            {
+                return query.Take(_pageItemCount).AsEnumerable().Distinct();
+            }
+            else
+            {
+                return query.Skip((pagenumber - 1) * _pageItemCount).Take(_pageItemCount).AsEnumerable().Distinct();
+            }
         }
     }
 }

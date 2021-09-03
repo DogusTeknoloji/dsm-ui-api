@@ -289,6 +289,12 @@ namespace DSM.UI.Api
                 .HasForeignKey(x => x.ServerId);
             });
 
+            modelBuilder.Entity<KPIMetricsView>(entity =>
+            {
+                entity.ToTable("KPIMetricsView");
+                entity.HasNoKey();
+            });
+
             modelBuilder.Entity<ScheduledJobItem>(entity =>
             {
                 entity.ToTable("JobInventory");
@@ -331,5 +337,6 @@ namespace DSM.UI.Api
         public DbSet<ElasticSearchInventoryItem> ElasticSearchInventory { get; set; }
         public DbSet<VCenterLog> VCenterLogs { get; set; }
         public DbSet<DbInventory> Dbinventory { get; set; }
+        public DbSet<KPIMetricsView> KPIMetricsViews { get; set; }
     }
 }

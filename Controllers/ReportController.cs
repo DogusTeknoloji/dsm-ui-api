@@ -130,6 +130,16 @@ namespace DSM.UI.Api.Controllers
             return File(exportData, "application/octet-stream");
         }
 
+        [HttpGet("kpistatus/{pagenumber}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult KPIMetricsView(int pagenumber)
+        {
+            var KPIStatusList = this._reportsService.GetKpiItems(pagenumber);
+            if (KPIStatusList == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            return this.Ok(KPIStatusList);
+        }
+
         [HttpGet("odmstatusreport/{pagenumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult GetODMStatusReport(int pagenumber)
