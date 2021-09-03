@@ -403,7 +403,6 @@ namespace DSM.UI.Api.Services
                             Aralik = kpi.Aralik
                         };
         
-
             if (pagenumber < 2)
             {
                 return query.Take(_pageItemCount).AsEnumerable().Distinct();
