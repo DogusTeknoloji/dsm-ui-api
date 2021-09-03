@@ -386,23 +386,23 @@ namespace DSM.UI.Api.Services
         {
             var query = from kpi in this._context.KPIMetricsViews
                         select new KPIMetricsView
-
-                {
-                    Application = kpi.Application,
-                    Year = kpi.Year,
-                    Ocak = kpi.Ocak,
-                    Subat = kpi.Subat,
-                    Mart = kpi.Mart,
-                    Nisan = kpi.Nisan,
-                    Mayis = kpi.Mayis,
-                    Haziran = kpi.Haziran,
-                    Temmuz = kpi.Temmuz,
-                    Agustos = kpi.Agustos,
-                    Eylul = kpi.Eylul,
-                    Ekim = kpi.Ekim,
-                    Kasim = kpi.Kasim,
-                    Aralik = kpi.Aralik
-                };
+                        {
+                            Application = kpi.Application,
+                            Year = kpi.Year,
+                            Ocak = kpi.Ocak,
+                            Subat = kpi.Subat,
+                            Mart = kpi.Mart,
+                            Nisan = kpi.Nisan,
+                            Mayis = kpi.Mayis,
+                            Haziran = kpi.Haziran,
+                            Temmuz = kpi.Temmuz,
+                            Agustos = kpi.Agustos,
+                            Eylul = kpi.Eylul,
+                            Ekim = kpi.Ekim,
+                            Kasim = kpi.Kasim,
+                            Aralik = kpi.Aralik
+                        };
+        
 
             if (pagenumber < 2)
             {
