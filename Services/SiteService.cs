@@ -160,8 +160,9 @@ namespace DSM.UI.Api.Services
 
             var query = from a in _context.Sites select a;
             query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
-
-            var results = query.ToList().Select(x => new SearchResult
+            
+            var results = query.ToList().Where(x => x.DateDeleted <= DateTime.Parse("1900-01-01"))
+                .Select(x => new SearchResult
             {
                 AppPoolName = x.ApplicationPoolName,
                 AppType = x.AppType,
