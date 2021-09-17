@@ -5,12 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace DSM.UI.Api.Services
-
 {
     public interface IMonitoringService
     {
         IEnumerable<Alerts> GetAlertsItems(int pagenumber);
-
     }
 
     public class MonitoringService : IMonitoringService

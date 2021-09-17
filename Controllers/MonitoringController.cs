@@ -27,6 +27,5 @@ namespace DSM.UI.Api.Controllers
 
             return this.Ok(AlertsList);
         }
-
     }
 }

@@ -7,7 +7,6 @@ namespace DSM.UI.Api.Models.Monitoring
 {
     public class AlertContacts
     {
-
         public int AlertContactId { get; set; }
         public int AlertId { get; set; }
         public int ContactId { get; set; }

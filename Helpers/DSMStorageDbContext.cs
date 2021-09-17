@@ -296,7 +296,6 @@ namespace DSM.UI.Api
                 entity.HasNoKey();
             });
 
-
             modelBuilder.Entity<Alerts>(entity =>
             {
                 entity.ToTable("Alerts");
@@ -308,7 +307,6 @@ namespace DSM.UI.Api
                 entity.ToTable("AlertContacts");
                 entity.HasKey("AlertContactId");
             });
-
 
             modelBuilder.Entity<ExtendedContact>(entity =>
             {
