@@ -3,6 +3,7 @@ using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.Company;
 using DSM.UI.Api.Models.Dashboard;
 using DSM.UI.Api.Models.DatabasePortal;
+using DSM.UI.Api.Models.Monitoring;
 using DSM.UI.Api.Models.Reports;
 using DSM.UI.Api.Models.Server;
 using Microsoft.EntityFrameworkCore;
@@ -295,6 +296,26 @@ namespace DSM.UI.Api
                 entity.HasNoKey();
             });
 
+
+            modelBuilder.Entity<Alerts>(entity =>
+            {
+                entity.ToTable("Alerts");
+                entity.HasKey("AlertId");
+            });
+
+            modelBuilder.Entity<AlertContacts>(entity =>
+            {
+                entity.ToTable("AlertContacts");
+                entity.HasKey("AlertContactId");
+            });
+
+
+            modelBuilder.Entity<ExtendedContact>(entity =>
+            {
+                entity.ToTable("ExtendedContact");
+                entity.HasKey("ExtendedContactId");
+            });
+
             modelBuilder.Entity<ScheduledJobItem>(entity =>
             {
                 entity.ToTable("JobInventory");
@@ -338,5 +359,8 @@ namespace DSM.UI.Api
         public DbSet<VCenterLog> VCenterLogs { get; set; }
         public DbSet<DbInventory> Dbinventory { get; set; }
         public DbSet<KPIMetricsView> KPIMetricsViews { get; set; }
+        public DbSet<Alerts> Alert { get; set; }
+        public DbSet<ExtendedContact> ExtendedContact { get; set; }
+        public DbSet<AlertContacts> AlertContacts { get; set; }
     }
 }
