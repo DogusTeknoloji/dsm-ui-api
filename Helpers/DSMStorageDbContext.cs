@@ -310,7 +310,7 @@ namespace DSM.UI.Api
 
             modelBuilder.Entity<ExtendedContact>(entity =>
             {
-                entity.ToTable("ExtendedContact");
+                entity.ToTable("ExtendedContacts");
                 entity.HasKey("ExtendedContactId");
             });
 

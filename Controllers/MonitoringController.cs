@@ -13,19 +13,29 @@ namespace DSM.UI.Api.Controllers
     {
         private readonly IMonitoringService _monitoringService;
 
-        public MonitoringController(IMonitoringService MonitoringService, IOptions<AppSettings> appSettings)
+        public MonitoringController(IMonitoringService monitoringService, IOptions<AppSettings> appSettings)
         {
-            this._monitoringService = (IMonitoringService)MonitoringService;
+            this._monitoringService = monitoringService;
         }
 
         [HttpGet("alerts/{pagenumber}")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Spectator, Manager, Administrator, CIFANG")]
         public IActionResult Alerts(int pagenumber)
         {
             var AlertsList = this._monitoringService.GetAlertsItems(pagenumber);
             if (AlertsList == null) return BadRequest(InvalidOperationError.GetInstance());
 
             return this.Ok(AlertsList);
+        }
+
+        [HttpGet("contacts/{alertId}")]
+        [Authorize(Roles = "Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult Contacts(int alertId)
+        {
+            var contactList = this._monitoringService.GetContactItems(alertId);
+            if (contactList == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            return this.Ok(contactList);
         }
     }
 }

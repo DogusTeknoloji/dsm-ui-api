@@ -102,6 +102,7 @@ namespace DSM.UI.Api
             services.AddScoped<IWebAccessLogService, WebAccessLogService>();
             services.AddScoped<IAzureDevOpsService, AzureDevOpsService>();
             services.AddScoped<IDatabasePortalService, DatabasePortalService>();
+            services.AddScoped<IMonitoringService, MonitoringService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
