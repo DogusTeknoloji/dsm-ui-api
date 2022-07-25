@@ -140,6 +140,17 @@ namespace DSM.UI.Api.Controllers
             return this.Ok(KPIStatusList);
         }
 
+        [HttpGet("kpistatus/{term}/{pagenumber}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult KpiMetricsViewWithParams(string term, int pagenumber)
+        {
+            var KPIStatusList = this._reportsService.GetKpiItemsWithTerm(term, pagenumber);
+
+            if (KPIStatusList == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            return this.Ok(KPIStatusList);
+        }
+
         [HttpGet("odmstatusreport/{pagenumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult GetODMStatusReport(int pagenumber)
