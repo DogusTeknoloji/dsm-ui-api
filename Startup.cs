@@ -110,7 +110,7 @@ namespace DSM.UI.Api
                     Name = "JWT Authentication",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
-                    Description = "Put **_ONLY_** your JWT Bearer token on textbox below!(Baþýna bearer yazmadan sadece tokeni yapýþtýrýn.)",
+                    Description = "Put **_ONLY_** your JWT Bearer token on textbox below!(Baï¿½ï¿½na bearer yazmadan sadece tokeni yapï¿½ï¿½tï¿½rï¿½n.)",
 
                     Reference = new OpenApiReference
                     {
@@ -137,6 +137,7 @@ namespace DSM.UI.Api
             services.AddScoped<IAzureDevOpsService, AzureDevOpsService>();
             services.AddScoped<IDatabasePortalService, DatabasePortalService>();
             services.AddScoped<IMonitoringService, MonitoringService>();
+            services.AddScoped<IResponsibleService, ResponsibleService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
