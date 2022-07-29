@@ -10,64 +10,63 @@ namespace DSM.UI.Api.Controllers
     [Route("[controller]")]
     public class ResponsibleController : ControllerBase
     {
-
-        private  readonly IResponsibleService _responsibleService;
+        private readonly IResponsibleService _responsibleService;
 
         public ResponsibleController(IResponsibleService responsibleService)
         {
             _responsibleService = responsibleService;
         }
-        
+
         [HttpGet("responsibles")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult GetResponsibles()
         {
             var responsibles = _responsibleService.GetResponsibles();
-            
+
             if (responsibles == null)
                 return this.BadRequest(new { message = "Invalid search term" });
-            
+
             return Ok(responsibles);
         }
-        
+
         [HttpGet("search/{term}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult Search(string term)
         {
             var searchResults = _responsibleService.SearchResponsibles(term);
             if (searchResults == null)
                 return this.BadRequest(new { message = "Invalid search term" });
-            
+
             return Ok(searchResults);
         }
-        
-        
+
+
         [HttpGet("servers/{responsibleName}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult GetDetailsServers(string responsibleName)
         {
             var servers = _responsibleService.GetDetailsServers(responsibleName);
-            
+
             if (servers == null)
                 return this.BadRequest(new { message = "Invalid search term" });
-            
+
             return Ok(servers);
         }
-        
+
         [HttpGet("sites/{responsibleName}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult GetDetailsSites(string responsibleName)
         {
             var sites = _responsibleService.GetDetailsSites(responsibleName);
-            
+
             if (sites == null)
                 return this.BadRequest(new { message = "Invalid search term" });
-            
+
             return Ok(sites);
         }
-        
+
         [HttpGet("export/{term}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult ExportResponsibles(string term)
         {
             var exportData = _responsibleService.DownloadResponsibles(term);
@@ -84,9 +83,9 @@ namespace DSM.UI.Api.Controllers
             Response.Headers.Add("Content-Disposition", cd.ToString());
             return File(exportData, "application/octet-stream");
         }
-        
+
         [HttpGet("export")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public IActionResult ExportCompanies()
         {
             var exportData = this._responsibleService.DownloadResponsibles();
