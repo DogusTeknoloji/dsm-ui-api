@@ -143,8 +143,6 @@ namespace DSM.UI.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-
             // Import custom web access log midleware
             app.UseWebAccessLog();
 
@@ -159,6 +157,9 @@ namespace DSM.UI.Api
             });
 
             app.UseRouting();
+            
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
