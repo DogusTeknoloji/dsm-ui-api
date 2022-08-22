@@ -9,6 +9,7 @@ namespace DSM.UI.Api.Services
     public interface IReportsService
     {
         IEnumerable<KPIMetricsView> GetKpiItems(int pagenumber);
+        IEnumerable<KPIMetricsView> GetKpiItemsWithTerm(object term, int pagenumber);
         IEnumerable<OverallDiskStatusItem> GetOverallDiskStatus(int pagenumber);
         IEnumerable<OverallDiskStatusItem> SearchOverallDiskStatus(object term);
         byte[] DownloadOverallDiskStatus();
@@ -403,6 +404,42 @@ namespace DSM.UI.Api.Services
                             Aralik = kpi.Aralik
                         };
         
+            if (pagenumber < 2)
+            {
+                return query.Take(_pageItemCount).AsEnumerable().Distinct();
+            }
+            else
+            {
+                return query.Skip((pagenumber - 1) * _pageItemCount).Take(_pageItemCount).AsEnumerable().Distinct();
+            }
+        }
+
+        public IEnumerable<KPIMetricsView> GetKpiItemsWithTerm(object term, int pagenumber)
+        {
+
+            IEnumerable<PropertyInfo> stringProperties = typeof(KPIMetricsView).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+
+            var query = from kpi in this._context.KPIMetricsViews
+                         select new KPIMetricsView
+                         {
+                             Application = kpi.Application,
+                             Year = kpi.Year,
+                             Ocak = kpi.Ocak,
+                             Subat = kpi.Subat,
+                             Mart = kpi.Mart,
+                             Nisan = kpi.Nisan,
+                             Mayis = kpi.Mayis,
+                             Haziran = kpi.Haziran,
+                             Temmuz = kpi.Temmuz,
+                             Agustos = kpi.Agustos,
+                             Eylul = kpi.Eylul,
+                             Ekim = kpi.Ekim,
+                             Kasim = kpi.Kasim,
+                             Aralik = kpi.Aralik
+                         };
+
+            query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
+
             if (pagenumber < 2)
             {
                 return query.Take(_pageItemCount).AsEnumerable().Distinct();
