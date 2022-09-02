@@ -91,5 +91,13 @@ namespace DSM.UI.Api.Controllers
             var result = this._dashboardService.GetTotalUserCount();
             return Ok(new { userCount = result });
         }
+        
+        [HttpGet("companyCount")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetCompanyCount()
+        {
+            var result = this._dashboardService.GetTotalCompanyCount();
+            return Ok(new { userCount = result });
+        }
     }
 }
