@@ -1,6 +1,7 @@
 ﻿using DSM.UI.Api.Models.Dashboard;
 using System.Collections.Generic;
 using System.Linq;
+using DSM.UI.Api.Helpers;
 
 namespace DSM.UI.Api.Services
 {
@@ -9,20 +10,73 @@ namespace DSM.UI.Api.Services
         IEnumerable<AppManagementLink> GetLinks();
         IEnumerable<ElasticSearchInventoryDetails> GetElasticSearchInventory();
         string GetDashboard();
+        CountOfServices GetAllCounts();
+        int GetTotalSiteCount();
+        int GetTotalServerCount();
+        int GetTotalResponsibilityCount();
+        int GetTotalCompanyCount();
+        int GetTotalDbCount();
+        int GetTotalUserCount();
     }
 
     public class DashboardService : IDashboardService
     {
         private readonly DSMStorageDataContext _context;
-        public DashboardService(DSMStorageDataContext context)
+        private readonly DSMAuthDbContext _authContext;
+
+        public DashboardService(DSMStorageDataContext context, DSMAuthDbContext authContext)
         {
             _context = context;
+            _authContext = authContext;
         }
 
         public string GetDashboard()
         {
             // Blank method for test. It won't be use
             return "Ok";
+        }
+
+        public CountOfServices GetAllCounts()
+        {
+            return new CountOfServices
+            {
+                SiteCount = GetTotalSiteCount(),
+                ServerCount = GetTotalServerCount(),
+                ResponsibleCount = GetTotalResponsibilityCount(),
+                CompanyCount = GetTotalCompanyCount(),
+                DatabasePortalCount = GetTotalDbCount(),
+                TotalUserCount = GetTotalUserCount()
+            };
+        }
+
+        public int GetTotalSiteCount()
+        {
+            return _context.Sites.Count();
+        }
+
+        public int GetTotalServerCount()
+        {
+            return _context.Servers.Count();
+        }
+
+        public int GetTotalResponsibilityCount()
+        {
+            return _context.Servers.Select(s => s.Responsible).Distinct().Count();
+        }
+
+        public int GetTotalCompanyCount()
+        {
+            return _context.Companies.Count();
+        }
+
+        public int GetTotalDbCount()
+        {
+            return _context.Dbinventory.Count();
+        }
+
+        public int GetTotalUserCount()
+        {
+            return _authContext.Users.Count();
         }
 
         public IEnumerable<AppManagementLink> GetLinks()
