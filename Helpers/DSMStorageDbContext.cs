@@ -1,5 +1,6 @@
 ﻿using DSM.Core.Models;
 using DSM.UI.Api.Models;
+using DSM.UI.Api.Models.AzureDevOps;
 using DSM.UI.Api.Models.Company;
 using DSM.UI.Api.Models.Dashboard;
 using DSM.UI.Api.Models.DatabasePortal;
@@ -338,6 +339,12 @@ namespace DSM.UI.Api
                 entity.HasNoKey();
             });
 
+            modelBuilder.Entity<AzurePortalInventory>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView("AzurePortalInventory");
+            });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -360,5 +367,6 @@ namespace DSM.UI.Api
         public DbSet<Alerts> Alert { get; set; }
         public DbSet<ExtendedContact> ExtendedContact { get; set; }
         public DbSet<AlertContacts> AlertContacts { get; set; }
+        public DbSet<AzurePortalInventory> AzurePortalInventory { get; set; }
     }
 }

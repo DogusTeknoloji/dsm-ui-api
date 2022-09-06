@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DSM.UI.Api.Services
 {
@@ -12,10 +14,20 @@ namespace DSM.UI.Api.Services
         Task<IEnumerable<ProjectResult>> GetProjectsAsync();
         Task<IEnumerable<DeploymentGroupResult>> GetDeploymentGroupsAsync();
         Task<IEnumerable<DeploymentAgentResult>> GetDeploymentAgentsAsync();
+        Task<IEnumerable<AzurePortalInventory>> GetAzurePortalInventoryAsync();
+        Task<AzurePortalSiteNameWithBindings> GetAzurePortalInventoryItem(int id);
+        Task<IEnumerable<AzurePortalSiteNameWithBindings>> GetSiteNamesWithBindings();
     }
+
     public partial class AzureDevOpsService : IAzureDevOpsService
     {
         private readonly string _organization = RequestHelper.AzureDevOpsOrganizationName;
+        private readonly DSMStorageDataContext _context;
+
+        public AzureDevOpsService(DSMStorageDataContext context)
+        {
+            _context = context;
+        }
 
         public async Task<IEnumerable<ProjectResult>> GetProjectsAsync()
         {
@@ -38,12 +50,14 @@ namespace DSM.UI.Api.Services
                     return results;
                 }
             }
+
             return cacheResults;
         }
 
         public async Task<IEnumerable<DeploymentGroupResult>> GetDeploymentGroupsAsync()
         {
-            CacheDBService<DeploymentGroupResult> cacheService = new CacheDBService<DeploymentGroupResult>("AzureDevOpsDeploymentGroups");
+            CacheDBService<DeploymentGroupResult> cacheService =
+                new CacheDBService<DeploymentGroupResult>("AzureDevOpsDeploymentGroups");
             IEnumerable<DeploymentGroupResult> cacheResults = cacheService.Get();
             if (cacheResults.Count() < 1)
             {
@@ -56,7 +70,8 @@ namespace DSM.UI.Api.Services
 
                     string rawJson = await RequestHelper.Evaluate(deploymentGroupsUrl);
 
-                    GenericHolder<DeploymentGroup> deploymentGroupHolder = JsonConvert.DeserializeObject<GenericHolder<DeploymentGroup>>(rawJson);
+                    GenericHolder<DeploymentGroup> deploymentGroupHolder =
+                        JsonConvert.DeserializeObject<GenericHolder<DeploymentGroup>>(rawJson);
 
                     if (deploymentGroupHolder != null && deploymentGroupHolder?.Count > 0)
                     {
@@ -69,12 +84,14 @@ namespace DSM.UI.Api.Services
                 cacheService.CreateMultiple(results, overwrite: true);
                 return results;
             }
+
             return cacheResults;
         }
 
         public async Task<IEnumerable<DeploymentAgentResult>> GetDeploymentAgentsAsync()
         {
-            CacheDBService<DeploymentAgentResult> cacheService = new CacheDBService<DeploymentAgentResult>("AzureDevOpsAgents");
+            CacheDBService<DeploymentAgentResult> cacheService =
+                new CacheDBService<DeploymentAgentResult>("AzureDevOpsAgents");
             IEnumerable<DeploymentAgentResult> cacheResults = cacheService.Get();
             if (cacheResults.Count() < 1)
             {
@@ -85,10 +102,12 @@ namespace DSM.UI.Api.Services
                     string projectId = deploymentGroup.ProjectId.ToString();
                     string deploymentGroupId = deploymentGroup.DeploymentGroupId.ToString();
 
-                    string deploymentTargetsUrl = AzureDevOpsUrl.TargetsUrl(_organization, projectId, deploymentGroupId);
+                    string deploymentTargetsUrl =
+                        AzureDevOpsUrl.TargetsUrl(_organization, projectId, deploymentGroupId);
                     string rawJson = await RequestHelper.Evaluate(deploymentTargetsUrl);
 
-                    GenericHolder<DeploymentTarget> deploymentTargetHolder = JsonConvert.DeserializeObject<GenericHolder<DeploymentTarget>>(rawJson);
+                    GenericHolder<DeploymentTarget> deploymentTargetHolder =
+                        JsonConvert.DeserializeObject<GenericHolder<DeploymentTarget>>(rawJson);
 
                     if (deploymentTargetHolder != null && deploymentTargetHolder?.Count > 0)
                     {
@@ -107,11 +126,66 @@ namespace DSM.UI.Api.Services
                         }
                     }
                 }
-                
+
                 cacheService.CreateMultiple(results, overwrite: true);
                 return results;
             }
+
             return cacheResults;
+        }
+
+        public async Task<IEnumerable<AzurePortalInventory>> GetAzurePortalInventoryAsync()
+        {
+            return await _context.AzurePortalInventory.ToListAsync();
+        }
+
+        public async Task<AzurePortalSiteNameWithBindings> GetAzurePortalInventoryItem(int id)
+        {
+            var portalItem = await _context.AzurePortalInventory.FirstOrDefaultAsync(i => i.Id == id);
+            var apInventory = await _context.AzurePortalInventory.Where(s => s.SiteName == portalItem.SiteName).ToListAsync();
+
+            var result = new AzurePortalSiteNameWithBindings
+            {
+                SiteName = portalItem.SiteName,
+                ResourceGroup = portalItem.ResourceGroup,
+                Id = portalItem.Id,
+                Bindings = new List<string>(),
+                DefaultHostName = portalItem.DefaultHostName,
+                OutboundIpAddresses = portalItem.OutboundIpAddresses
+            };
+            
+            result.Bindings.AddRange(apInventory.Select(x => x.Bindings));
+
+            return result;
+        }
+
+        public async Task<IEnumerable<AzurePortalSiteNameWithBindings>> GetSiteNamesWithBindings()
+        {
+            var resultList = new List<AzurePortalSiteNameWithBindings>();
+            var azurePortal = await _context.AzurePortalInventory.ToListAsync();
+
+            foreach (var item in azurePortal)
+            {
+                var siteName = item.SiteName;
+                var binding = item.Bindings;
+
+                var siteNameWithBindings = resultList.FirstOrDefault(x => x.SiteName == siteName);
+
+                if (siteNameWithBindings == null)
+                    resultList.Add(new AzurePortalSiteNameWithBindings
+                    {
+                        SiteName = siteName,
+                        Bindings = new List<string> { binding },
+                        Id = item.Id,
+                        ResourceGroup = item.ResourceGroup,
+                        DefaultHostName = item.DefaultHostName,
+                        OutboundIpAddresses = item.OutboundIpAddresses
+                    });
+                else
+                    siteNameWithBindings.Bindings.Add(binding);
+            }
+
+            return resultList;
         }
     }
 }

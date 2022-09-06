@@ -97,7 +97,7 @@ namespace DSM.UI.Api.Controllers
         public IActionResult GetCompanyCount()
         {
             var result = this._dashboardService.GetTotalCompanyCount();
-            return Ok(new { userCount = result });
+            return Ok(new { companyCount = result });
         }
     }
 }
