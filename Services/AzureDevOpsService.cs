@@ -151,7 +151,8 @@ namespace DSM.UI.Api.Services
                 Id = portalItem.Id,
                 Bindings = new List<string>(),
                 DefaultHostName = portalItem.DefaultHostName,
-                OutboundIpAddresses = portalItem.OutboundIpAddresses
+                OutboundIpAddresses = portalItem.OutboundIpAddresses,
+                SubscriptionName = portalItem.SubscriptionName
             };
             
             result.Bindings.AddRange(apInventory.Select(x => x.Bindings));
@@ -179,7 +180,8 @@ namespace DSM.UI.Api.Services
                         Id = item.Id,
                         ResourceGroup = item.ResourceGroup,
                         DefaultHostName = item.DefaultHostName,
-                        OutboundIpAddresses = item.OutboundIpAddresses
+                        OutboundIpAddresses = item.OutboundIpAddresses,
+                        SubscriptionName = item.SubscriptionName
                     });
                 else
                     siteNameWithBindings.Bindings.Add(binding);

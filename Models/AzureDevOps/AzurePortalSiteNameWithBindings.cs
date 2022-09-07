@@ -10,5 +10,7 @@ namespace DSM.UI.Api.Models.AzureDevOps
         public string DefaultHostName { get; set; }
         public string OutboundIpAddresses { get; set; }
         public string ResourceGroup { get; set; }
+        public string SubscriptionName { get; set; }
+        
     }
 }
