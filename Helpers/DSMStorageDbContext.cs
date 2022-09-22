@@ -2,6 +2,7 @@
 using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.AzureDevOps;
 using DSM.UI.Api.Models.Company;
+using DSM.UI.Api.Models.CustomerUrlLists;
 using DSM.UI.Api.Models.Dashboard;
 using DSM.UI.Api.Models.DatabasePortal;
 using DSM.UI.Api.Models.Monitoring;
@@ -345,6 +346,21 @@ namespace DSM.UI.Api
                 entity.ToView("AzurePortalInventory");
             });
 
+            modelBuilder.Entity<CustomerAppDbInventory>(entity =>
+            {
+                entity.HasKey("Id");
+            });
+            
+            modelBuilder.Entity<CustomerExternalUrl>(entity =>
+            {
+                entity.HasKey("Id");
+            });
+            
+            modelBuilder.Entity<CustomerInternalUrl>(entity =>
+            {
+                entity.HasKey("Id");
+            });
+            
             base.OnModelCreating(modelBuilder);
         }
 
@@ -368,5 +384,8 @@ namespace DSM.UI.Api
         public DbSet<ExtendedContact> ExtendedContact { get; set; }
         public DbSet<AlertContacts> AlertContacts { get; set; }
         public DbSet<AzurePortalInventory> AzurePortalInventory { get; set; }
+        public DbSet<CustomerAppDbInventory> CustomerAppDbInventories { get; set; }
+        public DbSet<CustomerExternalUrl> CustomerExternalUrls { get; set; }
+        public DbSet<CustomerInternalUrl> CustomerInternalUrls { get; set; }
     }
 }
