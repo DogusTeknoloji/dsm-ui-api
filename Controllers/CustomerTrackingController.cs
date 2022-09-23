@@ -52,7 +52,7 @@ namespace DSM.UI.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("AppDb/")]
+        [HttpPost("AppDb/update")]
         public async Task<IActionResult> UpdateCustomerAppDbInventory(
             [FromBody] CustomerAppDbInventory customerAppDbInventory)
         {
@@ -63,7 +63,7 @@ namespace DSM.UI.Api.Controllers
             return Ok(new { Message = "Record updated successfully", UpdatedEntity = result });
         }
 
-        [HttpDelete("AppDb/{id}")]
+        [HttpGet("AppDb/delete/{id}")]
         public async Task<IActionResult> DeleteCustomerAppDbInventory(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerAppDbInventoryAsync(id);
@@ -107,7 +107,7 @@ namespace DSM.UI.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("ExternalUrl/")]
+        [HttpPost("ExternalUrl/update")]
         public async Task<IActionResult> UpdateCustomerExternalUrl([FromBody] CustomerExternalUrl customerExternalUrl)
         {
             var result = await _customerTrackingService.UpdateCustomerExternalUrlAsync(customerExternalUrl);
@@ -117,7 +117,7 @@ namespace DSM.UI.Api.Controllers
             return Ok(new { Message = "Record updated successfully", UpdatedEntity = result });
         }
 
-        [HttpDelete("ExternalUrl/{id}")]
+        [HttpGet("ExternalUrl/delete/{id}")]
         public async Task<IActionResult> DeleteCustomerExternalUrl(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerExternalUrlAsync(id);
@@ -161,7 +161,7 @@ namespace DSM.UI.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("InternalUrl/")]
+        [HttpPost("InternalUrl/update")]
         public async Task<IActionResult> UpdateCustomerInternalUrl([FromBody] CustomerInternalUrl customerInternalUrl)
         {
             var result = await _customerTrackingService.UpdateCustomerInternalUrlAsync(customerInternalUrl);
@@ -171,7 +171,7 @@ namespace DSM.UI.Api.Controllers
             return Ok(new { Message = "Record updated successfully", UpdatedEntity = result });
         }
 
-        [HttpDelete("InternalUrl/{id}")]
+        [HttpGet("InternalUrl/delete/{id}")]
         public async Task<IActionResult> DeleteCustomerInternalUrl(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerInternalUrlAsync(id);
