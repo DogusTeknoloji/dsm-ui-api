@@ -349,16 +349,19 @@ namespace DSM.UI.Api
             modelBuilder.Entity<CustomerAppDbInventory>(entity =>
             {
                 entity.HasKey("Id");
+                entity.ToTable("VdfAppDbInventory");
             });
             
             modelBuilder.Entity<CustomerExternalUrl>(entity =>
             {
                 entity.HasKey("Id");
+                entity.ToTable("VdfExternalUrls");
             });
             
             modelBuilder.Entity<CustomerInternalUrl>(entity =>
             {
                 entity.HasKey("Id");
+                entity.ToTable("VdfInternalUrls");
             });
             
             base.OnModelCreating(modelBuilder);
