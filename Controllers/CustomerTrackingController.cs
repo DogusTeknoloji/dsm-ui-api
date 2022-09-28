@@ -59,7 +59,8 @@ namespace DSM.UI.Api.Controllers
             await _operationLogger.LogOperationToDbAsync(new OperationLog
             {
                 LoggedOperation = "CreateCustomerAppDbInventory", LogType = "Create", LogLocation = "AppDbInventory",
-                UserName = User.Identity.Name
+                UserName = User.Identity.Name,
+                AffectedObjectId = result.Id
             });
             
             return Ok(result);
