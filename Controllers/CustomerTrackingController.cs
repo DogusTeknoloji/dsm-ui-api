@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using DSM.UI.Api.Helpers;
 using DSM.UI.Api.Models.CustomerUrlLists;
+using DSM.UI.Api.Models.LogModels;
 using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +16,13 @@ namespace DSM.UI.Api.Controllers
     public class CustomerTrackingController : ControllerBase
     {
         private readonly ICustomerTrackingService _customerTrackingService;
+        private readonly IDSMOperationLogger _operationLogger;
 
-        public CustomerTrackingController(ICustomerTrackingService customerTrackingService)
+        public CustomerTrackingController(ICustomerTrackingService customerTrackingService,
+            IDSMOperationLogger operationLogger)
         {
             _customerTrackingService = customerTrackingService;
+            _operationLogger = operationLogger;
         }
 
         #region CustomerAppDbInventory Region
@@ -49,6 +55,12 @@ namespace DSM.UI.Api.Controllers
             if (result == null)
                 return BadRequest(new { message = "Error while creating record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "CreateCustomerAppDbInventory", LogType = "Create", LogLocation = "AppDbInventory",
+                UserName = User.Identity.Name
+            });
+            
             return Ok(result);
         }
 
@@ -60,6 +72,13 @@ namespace DSM.UI.Api.Controllers
             if (result == null)
                 return BadRequest(new { message = "Error while updating record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "UpdateCustomerAppDbInventory", LogType = "Update", LogLocation = "AppDbInventory",
+                UserName = User.Identity.Name,
+                AffectedObjectId = result.Id,
+            });
+            
             return Ok(new { Message = "Record updated successfully", UpdatedEntity = result });
         }
 
@@ -70,6 +89,13 @@ namespace DSM.UI.Api.Controllers
             if (!result)
                 return BadRequest(new { message = "Error while deleting record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "DeleteCustomerAppDbInventory", LogType = "Delete", LogLocation = "AppDbInventory",
+                UserName = User.Identity.Name,
+                AffectedObjectId = id
+            });
+            
             return Ok(new { message = "Record deleted successfully" });
         }
 
@@ -104,6 +130,13 @@ namespace DSM.UI.Api.Controllers
             if (result == null)
                 return BadRequest(new { message = "Error while creating record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "CreateCustomerExternalUrl", LogType = "Create", LogLocation = "ExternalUrl",
+                UserName = User.Identity.Name,
+                AffectedObjectId = result.Id
+            });
+
             return Ok(result);
         }
 
@@ -113,6 +146,13 @@ namespace DSM.UI.Api.Controllers
             var result = await _customerTrackingService.UpdateCustomerExternalUrlAsync(customerExternalUrl);
             if (result == null)
                 return BadRequest(new { message = "Error while updating record" });
+
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "UpdateCustomerExternalUrl", LogType = "Update", LogLocation = "ExternalUrl",
+                UserName = User.Identity.Name,
+                AffectedObjectId = result.Id
+            });
 
             return Ok(new { Message = "Record updated successfully", UpdatedEntity = result });
         }
@@ -124,6 +164,13 @@ namespace DSM.UI.Api.Controllers
             if (!result)
                 return BadRequest(new { message = "Error while deleting record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "DeleteCustomerExternalUrl", LogType = "Delete", LogLocation = "ExternalUrl",
+                UserName = User.Identity.Name,
+                AffectedObjectId = id
+            });
+            
             return Ok(new { message = "Record deleted successfully" });
         }
 
@@ -158,6 +205,13 @@ namespace DSM.UI.Api.Controllers
             if (result == null)
                 return BadRequest(new { message = "Error while creating record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "CreateCustomerInternalUrl", LogType = "Create", LogLocation = "InternalUrl",
+                UserName = User.Identity.Name,
+                AffectedObjectId = result.Id
+            });
+            
             return Ok(result);
         }
 
@@ -168,6 +222,13 @@ namespace DSM.UI.Api.Controllers
             if (result == null)
                 return BadRequest(new { message = "Error while updating record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "UpdateCustomerInternalUrl", LogType = "Update", LogLocation = "InternalUrl",
+                UserName = User.Identity.Name,
+                AffectedObjectId = result.Id
+            });
+            
             return Ok(new { Message = "Record updated successfully", UpdatedEntity = result });
         }
 
@@ -178,6 +239,13 @@ namespace DSM.UI.Api.Controllers
             if (!result)
                 return BadRequest(new { message = "Error while deleting record" });
 
+            await _operationLogger.LogOperationToDbAsync(new OperationLog
+            {
+                LoggedOperation = "DeleteCustomerInternalUrl", LogType = "Delete", LogLocation = "InternalUrl",
+                UserName = User.Identity.Name,
+                AffectedObjectId = id
+            });
+            
             return Ok(new { message = "Record deleted successfully" });
         }
 
