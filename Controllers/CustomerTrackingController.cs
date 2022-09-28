@@ -6,12 +6,10 @@ using DSM.UI.Api.Models.LogModels;
 using DSM.UI.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace DSM.UI.Api.Controllers
 {
     [ApiController]
-    [Authorize(Roles = "Administrator, CIFANG")]
     [Route("[controller]")]
     public class CustomerTrackingController : ControllerBase
     {
@@ -28,6 +26,7 @@ namespace DSM.UI.Api.Controllers
         #region CustomerAppDbInventory Region
 
         [HttpGet("AppDb/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public async Task<IActionResult> GetAllCustomerAppDbInventories()
         {
             var result = await _customerTrackingService.GetAllCustomerAppDbInventoriesAsync();
@@ -38,6 +37,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("AppDb/{id}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public async Task<IActionResult> GetCustomerAppDbInventoryById(int id)
         {
             var result = await _customerTrackingService.GetCustomerAppDbInventoryAsync(id);
@@ -48,6 +48,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("AppDb/")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> CreateCustomerAppDbInventory(
             [FromBody] CustomerAppDbInventory customerAppDbInventory)
         {
@@ -65,6 +66,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("AppDb/update")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> UpdateCustomerAppDbInventory(
             [FromBody] CustomerAppDbInventory customerAppDbInventory)
         {
@@ -83,6 +85,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("AppDb/delete/{id}")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> DeleteCustomerAppDbInventory(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerAppDbInventoryAsync(id);
@@ -99,11 +102,51 @@ namespace DSM.UI.Api.Controllers
             return Ok(new { message = "Record deleted successfully" });
         }
 
+        [HttpGet("AppDb/Export/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportAppDbInventoryUrls()
+        {
+            var exportData = _customerTrackingService.DownloadAppDbInventory();
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+        
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_APP_DB_INVENTORY_{0}.xlsx", date),
+                Inline = false,
+            };
+            
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
+        }
+
+        
+        [HttpGet("AppDb/Export/{term}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportAppDbInventoryUrls(string term)
+        {
+            var exportData = _customerTrackingService.DownloadAppDbInventory(term);
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+        
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_APP_DB_INVENTORY_{0}.xlsx", date),
+                Inline = false,
+            };
+            
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
+        }
+        
         #endregion
 
         #region CustomerExternalUrl Region
 
         [HttpGet("ExternalUrl/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public async Task<IActionResult> GetAllCustomerExternalUrls()
         {
             var result = await _customerTrackingService.GetAllCustomerExternalUrlsAsync();
@@ -114,6 +157,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("ExternalUrl/{id}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public async Task<IActionResult> GetCustomerExternalUrlById(int id)
         {
             var result = await _customerTrackingService.GetCustomerExternalUrlAsync(id);
@@ -124,6 +168,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("ExternalUrl/")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> CreateCustomerExternalUrl([FromBody] CustomerExternalUrl customerExternalUrl)
         {
             var result = await _customerTrackingService.AddCustomerExternalUrlAsync(customerExternalUrl);
@@ -141,6 +186,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("ExternalUrl/update")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> UpdateCustomerExternalUrl([FromBody] CustomerExternalUrl customerExternalUrl)
         {
             var result = await _customerTrackingService.UpdateCustomerExternalUrlAsync(customerExternalUrl);
@@ -158,6 +204,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("ExternalUrl/delete/{id}")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> DeleteCustomerExternalUrl(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerExternalUrlAsync(id);
@@ -174,11 +221,51 @@ namespace DSM.UI.Api.Controllers
             return Ok(new { message = "Record deleted successfully" });
         }
 
+        [HttpGet("ExternalUrl/Export/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportExternalUrls()
+        {
+            var exportData = _customerTrackingService.DownloadExternalUrls();
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+        
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_EXTERNAL_URLS_{0}.xlsx", date),
+                Inline = false,
+            };
+            
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
+        }
+
+        
+        [HttpGet("ExternalUrl/Export/{term}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportExternalUrls(string term)
+        {
+            var exportData = _customerTrackingService.DownloadExternalUrls(term);
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+        
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_EXTERNAL_URLS_{0}.xlsx", date),
+                Inline = false,
+            };
+            
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
+        }
+        
         #endregion
 
         #region CustomerInternalUrl Region
 
         [HttpGet("InternalUrl/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public async Task<IActionResult> GetAllCustomerInternalUrls()
         {
             var result = await _customerTrackingService.GetAllCustomerInternalUrlsAsync();
@@ -189,6 +276,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("InternalUrl/{id}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public async Task<IActionResult> GetCustomerInternalUrlById(int id)
         {
             var result = await _customerTrackingService.GetCustomerInternalUrlAsync(id);
@@ -199,6 +287,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("InternalUrl/")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> CreateCustomerInternalUrl([FromBody] CustomerInternalUrl customerInternalUrl)
         {
             var result = await _customerTrackingService.AddCustomerInternalUrlAsync(customerInternalUrl);
@@ -216,6 +305,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("InternalUrl/update")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> UpdateCustomerInternalUrl([FromBody] CustomerInternalUrl customerInternalUrl)
         {
             var result = await _customerTrackingService.UpdateCustomerInternalUrlAsync(customerInternalUrl);
@@ -233,6 +323,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("InternalUrl/delete/{id}")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> DeleteCustomerInternalUrl(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerInternalUrlAsync(id);
@@ -247,6 +338,45 @@ namespace DSM.UI.Api.Controllers
             });
             
             return Ok(new { message = "Record deleted successfully" });
+        }
+
+        [HttpGet("InternalUrl/Export/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportInternalUrls()
+        {
+            var exportData = _customerTrackingService.DownloadInternalUrls();
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+        
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_INTERNAL_URLS_{0}.xlsx", date),
+                Inline = false,
+            };
+            
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
+        }
+
+        
+        [HttpGet("InternalUrl/Export/{term}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult ExportInternalUrls(string term)
+        {
+            var exportData = _customerTrackingService.DownloadInternalUrls(term);
+            if (exportData == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            string date = DateTime.Now.ToString("yyyyMMdd");
+        
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = string.Format("DSM_EXPORT_INTERNAL_URLS_{0}.xlsx", date),
+                Inline = false,
+            };
+            
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(exportData, "application/octet-stream");
         }
 
         #endregion
