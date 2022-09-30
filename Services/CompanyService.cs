@@ -4,6 +4,7 @@ using DSM.UI.Api.Models.Company;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace DSM.UI.Api.Services
 {
@@ -16,6 +17,9 @@ namespace DSM.UI.Api.Services
         IEnumerable<string> GetLetters();
         IEnumerable<SearchResult> GetCompanyByLetter(string letter, int pagenumber);
         IEnumerable<SearchResult> GetCompanies(int pagenumber);
+        IEnumerable<SearchResult> GetCompaniesIfAnyServerExists(int pagenumber);
+        int GetCompanyServerCount(int companyId);
+        int GetCompanySiteCount(int companyId);
         byte[] DownloadCompanies(object term);
         byte[] DownloadCompanies();
     }
@@ -109,6 +113,20 @@ namespace DSM.UI.Api.Services
             }
         }
 
+        public int GetCompanySiteCount(int companyId)
+        {
+            return (from server in _context.Servers
+                join site in _context.Sites
+                    on server.ServerName.ToUpper() equals site.MachineName.ToUpper()
+                where server.CompanyId == companyId
+                select site).Count();
+        }
+
+        public int GetCompanyServerCount(int companyId)
+        {
+            return _context.Servers.Count(c => c.CompanyId == companyId);
+        }
+        
         public IEnumerable<SearchResult> GetCompanies(int pagenumber)
         {
             int pageItemCount = 100;
@@ -124,6 +142,29 @@ namespace DSM.UI.Api.Services
             else
             {
                 var query = this._context.Companies.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
+                {
+                    CompanyId = x.CompanyId,
+                    Name = x.Name
+                });
+                return query;
+            }
+        }
+        
+        public IEnumerable<SearchResult> GetCompaniesIfAnyServerExists(int pagenumber)
+        {
+            int pageItemCount = 100;
+            if (pagenumber < 2)
+            {
+                var query = this._context.Companies.Where(x => x.Servers.Any()).Take(pageItemCount).Select(x => new SearchResult
+                {
+                    CompanyId = x.CompanyId,
+                    Name = x.Name
+                });
+                return query;
+            }
+            else
+            {
+                var query = this._context.Companies.Where(x => x.Servers.Any()).Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
                 {
                     CompanyId = x.CompanyId,
                     Name = x.Name

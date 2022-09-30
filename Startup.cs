@@ -138,6 +138,9 @@ namespace DSM.UI.Api
             services.AddScoped<IDatabasePortalService, DatabasePortalService>();
             services.AddScoped<IMonitoringService, MonitoringService>();
             services.AddScoped<IResponsibleService, ResponsibleService>();
+            services.AddScoped<ICustomerTrackingService, CustomerTrackingService>();
+
+            services.AddScoped<IDSMOperationLogger, DSMOperationLogger>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

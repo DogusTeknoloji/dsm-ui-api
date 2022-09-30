@@ -43,5 +43,61 @@ namespace DSM.UI.Api.Controllers
             var result = this._dashboardService.GetDashboard();
             return Ok(result);
         }
+
+        [HttpGet("allCounts")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetAllCounts()
+        {
+            var result = this._dashboardService.GetAllCounts();
+            return Ok(result);
+        }
+
+        [HttpGet("serverCount")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetServerCounts()
+        {
+            var result = this._dashboardService.GetTotalServerCount();
+            return Ok(new { serverCount = result });
+        }
+
+        [HttpGet("siteCount")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetSiteCounts()
+        {
+            var result = this._dashboardService.GetTotalSiteCount();
+            return Ok(new { siteCount = result });
+        }
+
+        [HttpGet("responsibilityCount")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetResponsibilityCounts()
+        {
+            var result = this._dashboardService.GetTotalResponsibilityCount();
+            return Ok(new { responsibilityCount = result });
+        }
+
+        [HttpGet("dbCount")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetDbCounts()
+        {
+            var result = this._dashboardService.GetTotalDbCount();
+            return Ok(new { dbCount = result });
+        }
+
+        [HttpGet("userCount")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetUserCounts()
+        {
+            var result = this._dashboardService.GetTotalUserCount();
+            return Ok(new { userCount = result });
+        }
+        
+        [HttpGet("companyCount")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetCompanyCount()
+        {
+            var result = this._dashboardService.GetTotalCompanyCount();
+            return Ok(new { companyCount = result });
+        }
     }
 }

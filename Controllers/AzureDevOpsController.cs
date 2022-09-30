@@ -43,5 +43,36 @@ namespace DSM.UI.Api.Controllers
             if (deploymentAgentInfo == null) return this.BadRequest(InvalidOperationError.GetInstance());
             return this.Ok(deploymentAgentInfo);
         }
+
+        [HttpGet("azure-portal-inventory")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public async  Task<IActionResult> GetAzurePortalInventory()
+        {
+            var azurePortalInventory = await this._azureDevOpsService.GetAzurePortalInventoryAsync();
+            if (azurePortalInventory == null) return this.BadRequest(InvalidOperationError.GetInstance());
+            return this.Ok(azurePortalInventory);
+        }
+
+        [HttpGet("azure-portal-inventory/{id}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public async Task<IActionResult> GetAzurePortalInventoryById(int id)
+        {
+            var result = await this._azureDevOpsService.GetAzurePortalInventoryItem(id);
+            
+            if (result == null) return this.BadRequest(InvalidOperationError.GetInstance());
+            
+            return this.Ok(result);
+        }
+        
+        [HttpGet("azure-portal-inventory/site-bindings")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public async Task<IActionResult> GetAzurePortalInventoryBySiteName()
+        {
+            var result = await this._azureDevOpsService.GetSiteNamesWithBindings();
+            
+            if (result == null) return this.BadRequest(InvalidOperationError.GetInstance());
+            
+            return this.Ok(result);
+        }
     }
 }
