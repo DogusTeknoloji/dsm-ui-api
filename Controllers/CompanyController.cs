@@ -82,6 +82,15 @@ namespace DSM.UI.Api.Controllers
             if (companyInfo == null) return BadRequest(InvalidOperationError.GetInstance());
             return Ok(companyInfo.OrderBy(x => x.Name));
         }
+        
+        [HttpGet("serverExists/{pagenumber}")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetCompaniesIfAnyServerExists(int pagenumber)
+        {
+            var companyInfo = this._companyService.GetCompaniesIfAnyServerExists(pagenumber);
+            if (companyInfo == null) return BadRequest(InvalidOperationError.GetInstance());
+            return Ok(companyInfo.OrderBy(x => x.Name));
+        }
 
         [HttpGet("count/server/{companyId}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
