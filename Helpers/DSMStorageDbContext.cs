@@ -378,6 +378,12 @@ namespace DSM.UI.Api
                 entity.ToTable("UpdatedSiteInventory");
             });
             
+            modelBuilder.Entity<DetailedServerInventoryItem>(entity =>
+            {
+                entity.HasKey("Id");
+                entity.ToTable("ReidinServerList");
+            });
+            
             base.OnModelCreating(modelBuilder);
         }
 
@@ -405,6 +411,7 @@ namespace DSM.UI.Api
         public DbSet<CustomerExternalUrl> CustomerExternalUrls { get; set; }
         public DbSet<CustomerInternalUrl> CustomerInternalUrls { get; set; }
         public DbSet<UpdatedSiteInventoryItem> UpdatedSiteInventoryItems { get; set; }
+        public DbSet<DetailedServerInventoryItem> DetailedServerInventoryItems { get; set; }
         public DbSet<OperationLog> OperationLogs { get; set; } 
         
     }
