@@ -5,6 +5,7 @@ using DSM.UI.Api.Models.Company;
 using DSM.UI.Api.Models.CustomerUrlLists;
 using DSM.UI.Api.Models.Dashboard;
 using DSM.UI.Api.Models.DatabasePortal;
+using DSM.UI.Api.Models.EditableInventory;
 using DSM.UI.Api.Models.LogModels;
 using DSM.UI.Api.Models.Monitoring;
 using DSM.UI.Api.Models.Reports;
@@ -370,6 +371,18 @@ namespace DSM.UI.Api
                 entity.HasKey("Id");
                 entity.ToTable("DSMOperationLogs");
             });
+
+            modelBuilder.Entity<UpdatedSiteInventoryItem>(entity =>
+            {
+                entity.HasKey("Id");
+                entity.ToTable("UpdatedSiteInventory");
+            });
+            
+            modelBuilder.Entity<DetailedServerInventoryItem>(entity =>
+            {
+                entity.HasKey("Id");
+                entity.ToTable("ReidinServerList");
+            });
             
             base.OnModelCreating(modelBuilder);
         }
@@ -397,6 +410,9 @@ namespace DSM.UI.Api
         public DbSet<CustomerAppDbInventory> CustomerAppDbInventories { get; set; }
         public DbSet<CustomerExternalUrl> CustomerExternalUrls { get; set; }
         public DbSet<CustomerInternalUrl> CustomerInternalUrls { get; set; }
+        public DbSet<UpdatedSiteInventoryItem> UpdatedSiteInventoryItems { get; set; }
+        public DbSet<DetailedServerInventoryItem> DetailedServerInventoryItems { get; set; }
         public DbSet<OperationLog> OperationLogs { get; set; } 
+        
     }
 }
