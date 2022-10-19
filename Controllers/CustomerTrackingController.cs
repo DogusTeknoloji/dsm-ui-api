@@ -48,7 +48,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("AppDb/")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> CreateCustomerAppDbInventory(
             [FromBody] CustomerAppDbInventory customerAppDbInventory)
         {
@@ -67,7 +67,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("AppDb/update")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> UpdateCustomerAppDbInventory(
             [FromBody] CustomerAppDbInventory customerAppDbInventory)
         {
@@ -86,7 +86,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("AppDb/delete/{id}")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> DeleteCustomerAppDbInventory(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerAppDbInventoryAsync(id);
@@ -169,7 +169,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("ExternalUrl/")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> CreateCustomerExternalUrl([FromBody] CustomerExternalUrl customerExternalUrl)
         {
             var result = await _customerTrackingService.AddCustomerExternalUrlAsync(customerExternalUrl);
@@ -187,7 +187,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("ExternalUrl/update")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> UpdateCustomerExternalUrl([FromBody] CustomerExternalUrl customerExternalUrl)
         {
             var result = await _customerTrackingService.UpdateCustomerExternalUrlAsync(customerExternalUrl);
@@ -205,7 +205,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("ExternalUrl/delete/{id}")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> DeleteCustomerExternalUrl(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerExternalUrlAsync(id);
@@ -288,7 +288,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("InternalUrl/")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> CreateCustomerInternalUrl([FromBody] CustomerInternalUrl customerInternalUrl)
         {
             var result = await _customerTrackingService.AddCustomerInternalUrlAsync(customerInternalUrl);
@@ -306,7 +306,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpPost("InternalUrl/update")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> UpdateCustomerInternalUrl([FromBody] CustomerInternalUrl customerInternalUrl)
         {
             var result = await _customerTrackingService.UpdateCustomerInternalUrlAsync(customerInternalUrl);
@@ -324,7 +324,7 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet("InternalUrl/delete/{id}")]
-        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        [Authorize(Roles = "Administrator, CIFANG")]
         public async Task<IActionResult> DeleteCustomerInternalUrl(int id)
         {
             var result = await _customerTrackingService.DeleteCustomerInternalUrlAsync(id);
