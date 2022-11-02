@@ -140,6 +140,7 @@ namespace DSM.UI.Api
             services.AddScoped<IResponsibleService, ResponsibleService>();
             services.AddScoped<ICustomerTrackingService, CustomerTrackingService>();
             services.AddScoped<IInventoryTrackingService, InventoryTrackingService>();
+            services.AddScoped<ICustomService, CustomService>();
 
             services.AddScoped<IDSMOperationLogger, DSMOperationLogger>();
         }
