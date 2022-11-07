@@ -53,5 +53,18 @@ namespace DSM.UI.Api.Controllers
 
             return Ok(result);
         }
+        
+        [HttpGet]
+        [Route("getSentryByMonthRange/")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public async Task<IActionResult> GetSentryWithTimeRangeAsync(int monthRange = 1)
+        {
+            var result = await _customService.GetSentryWithTimeRangeAsync(monthRange);
+
+            if (result == null)
+                return NotFound("No sentry for today, please check excel file.");
+
+            return Ok(result);
+        }
     }
 }
