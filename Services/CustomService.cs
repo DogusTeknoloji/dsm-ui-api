@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Bibliography;
 using DSM.UI.Api.Helpers.CustomHelpers;
 using DSM.UI.Api.Models.CustomModels;
 using Microsoft.EntityFrameworkCore;
