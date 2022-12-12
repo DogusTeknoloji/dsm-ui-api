@@ -5,6 +5,7 @@ using DSM.UI.Api.Helpers.CompanyComparer;
 using DSM.UI.Api.Models.Company;
 using DSM.UI.Api.Models.Responsible;
 using DSM.UI.Api.Models.Server;
+using Microsoft.EntityFrameworkCore;
 using DetailsSites = DSM.UI.Api.Models.Company.DetailsSites;
 
 namespace DSM.UI.Api.Services
@@ -66,54 +67,60 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<DetailsServers> GetDetailsServers(string responsibleName)
         {
-            var query = from server in _context.Servers.ToList()
-                where server.Responsible == responsibleName
-                select new DetailsServers
-                {
-                    ServerId = server.ServerId,
-                    ApplicationType = server.ServiceName,
-                    ServerName = server.ServerName,
-                    Contact = server.Responsible,
-                    Environments = server.ServerType,
-                    FullName = server.HostName,
-                    IpAddress = server.IpAddress,
-                    LastBackupDate = server.LastBackup.ToString(),
-                    OperatingSystem = server.OperatingSystem,
-                    Owner = GetServerCompany(server.CompanyId)
-                };
-
-            return query.Distinct();
+           return _context.Servers.Where(server => server.Responsible == responsibleName)
+               .Distinct()
+               .ToList()
+               .Select(server =>
+                   new DetailsServers
+                   {
+                       ServerId = server.ServerId,
+                       ApplicationType = server.ServiceName,
+                       ServerName = server.ServerName,
+                       Contact = server.Responsible,
+                       Environments = server.ServerType,
+                       FullName = server.HostName,
+                       IpAddress = server.IpAddress,
+                       LastBackupDate = server.LastBackup.ToString(),
+                       OperatingSystem = server.OperatingSystem,
+                       Owner = GetServerCompany(server.CompanyId)
+                   }
+               ).Distinct();
         }
 
         public IEnumerable<DetailsSites> GetDetailsSites(string responsibleName)
         {
-            var query = from server in _context.Servers.ToList()
-                join site in _context.Sites
-                    on server.ServerName.ToUpper() equals site.MachineName.ToUpper()
-                where server.Responsible == responsibleName
-                select new DetailsSites
+            
+            return _context.Servers
+                .Join(_context.Sites,
+                    server => server.ServerName.ToUpper(),
+                    site => site.MachineName.ToUpper(),
+                    (server, site) => new { server, site })
+                .Where(x => x.server.Responsible == responsibleName)
+                .Select(x => new DetailsSites
                 {
-                    SiteId = site.SiteId,
-                    PhysicalPath = site.PhysicalPath,
-                    SiteName = site.Name,
-                    ServerName = server.ServerName,
-                    DnsName = server.HostName,
-                    State = site.State,
-                    AppType = site.AppType,
-                    Domains = server.HostName
-                };
-            return query.Distinct(DetailsSiteComparer.Instance);
+                    SiteId = x.site.SiteId,
+                    PhysicalPath = x.site.PhysicalPath,
+                    SiteName = x.site.Name,
+                    ServerName = x.server.ServerName,
+                    DnsName = x.server.HostName,
+                    State = x.site.State,
+                    AppType = x.site.AppType,
+                    Domains = x.server.HostName
+                }).Distinct().ToList();
         }
 
         public IEnumerable<RespSearchResult> GetResponsibles()
         {
-            return _context.Servers.ToList()
-                .Select(s => new RespSearchResult
-                {
-                    ResponsibleName = s.Responsible,
-                    CountOfServers = GetResponsibleServerCount(s.Responsible),
-                    CountOfSites = GetResponsibleSiteCount(s.Responsible)
-                });
+            return _context.Servers.Select(x => x.Responsible)
+                .Distinct()
+                .ToList()
+                .Select(responsible =>
+                    new RespSearchResult
+                    {
+                        ResponsibleName = responsible,
+                        CountOfServers = GetResponsibleServerCount(responsible),
+                        CountOfSites = GetResponsibleSiteCount(responsible)
+                    });
         }
 
         private string GetServerCompany(int id)
