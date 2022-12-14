@@ -11,6 +11,7 @@ using DSM.UI.Api.Models.LogModels;
 using DSM.UI.Api.Models.Monitoring;
 using DSM.UI.Api.Models.Reports;
 using DSM.UI.Api.Models.Server;
+using DSM.UI.Api.Models.UploadedFiles;
 using Microsoft.EntityFrameworkCore;
 
 namespace DSM.UI.Api
@@ -391,6 +392,12 @@ namespace DSM.UI.Api
                 entity.ToTable("DTNobetCizelgesi");
             });
             
+            modelBuilder.Entity<UploadedFileDetail>(entity =>
+            {
+                entity.HasKey("Id");
+                entity.ToTable("UploadedFiles");
+            });
+            
             base.OnModelCreating(modelBuilder);
         }
 
@@ -420,6 +427,7 @@ namespace DSM.UI.Api
         public DbSet<UpdatedSiteInventoryItem> UpdatedSiteInventoryItems { get; set; }
         public DbSet<DetailedServerInventoryItem> DetailedServerInventoryItems { get; set; }
         public DbSet<SentryListItem> SentryListItems { get; set; }
+        public DbSet<UploadedFileDetail> UploadedFileDetails { get; set; }
         public DbSet<OperationLog> OperationLogs { get; set; } 
         
     }
