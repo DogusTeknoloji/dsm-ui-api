@@ -44,6 +44,8 @@ namespace DSM.UI.Api
 
             var cachingSetings = cacheDbSettingsSection.Get<CacheDBSettings>();
 
+            services.Configure<FTPSettings>(Configuration.GetSection("FTPSettings"));
+            
             var client = new MongoClient(cachingSetings.ConnectionString);
             var database = client.GetDatabase(cachingSetings.DatabaseName);
             Helpers.Caching.CacheHelper.CacheDatabase = database;
@@ -141,7 +143,8 @@ namespace DSM.UI.Api
             services.AddScoped<ICustomerTrackingService, CustomerTrackingService>();
             services.AddScoped<IInventoryTrackingService, InventoryTrackingService>();
             services.AddScoped<ICustomService, CustomService>();
-
+            services.AddScoped<IFileUploadService, FileUploadService>();
+            
             services.AddScoped<IDSMOperationLogger, DSMOperationLogger>();
         }
 
