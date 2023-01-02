@@ -235,8 +235,9 @@ namespace DSM.UI.Api.Services
                         FrontApp = x.FrontApp,
                         SourceIpPort = x.SourceIpPort,
                         DestinationURL = x.DestinationURL,
-                        DestinationIP = x.DestinationIP,
-                        DestinationPort = x.DestinationPort,
+                        DestinationIP_Port = x.DestinationIP_Port,
+                        IsFollowing = x.IsFollowing,
+                        ServiceExplanation = x.ServiceExplanation,
                         FromServer = x.FromServer,
                         LoadBalancerIP = x.LoadBalancerIP
                     }
@@ -258,8 +259,9 @@ namespace DSM.UI.Api.Services
                         FrontApp = x.FrontApp,
                         SourceIpPort = x.SourceIpPort,
                         DestinationURL = x.DestinationURL,
-                        DestinationIP = x.DestinationIP,
-                        DestinationPort = x.DestinationPort,
+                        DestinationIP_Port = x.DestinationIP_Port,
+                        IsFollowing = x.IsFollowing,
+                        ServiceExplanation = x.ServiceExplanation,
                         FromServer = x.FromServer,
                         LoadBalancerIP = x.LoadBalancerIP
                     }
@@ -288,8 +290,9 @@ namespace DSM.UI.Api.Services
                         FrontApp = x.FrontApp,
                         SourceIpPort = x.SourceIpPort,
                         DestinationURL = x.DestinationURL,
-                        DestinationIP = x.DestinationIP,
-                        DestinationPort = x.DestinationPort,
+                        DestinationIP_Port = x.DestinationIP_Port,
+                        IsFollowing = x.IsFollowing,
+                        ServiceExplanation = x.ServiceExplanation,
                         FromServer = x.FromServer,
                         LoadBalancerIP = x.LoadBalancerIP
                     }
@@ -311,8 +314,9 @@ namespace DSM.UI.Api.Services
                         FrontApp = x.FrontApp,
                         SourceIpPort = x.SourceIpPort,
                         DestinationURL = x.DestinationURL,
-                        DestinationIP = x.DestinationIP,
-                        DestinationPort = x.DestinationPort,
+                        DestinationIP_Port = x.DestinationIP_Port,
+                        IsFollowing = x.IsFollowing,
+                        ServiceExplanation = x.ServiceExplanation,
                         FromServer = x.FromServer,
                         LoadBalancerIP = x.LoadBalancerIP
                     }
