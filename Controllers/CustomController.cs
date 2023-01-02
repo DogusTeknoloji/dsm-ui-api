@@ -16,11 +16,11 @@ namespace DSM.UI.Api.Controllers
         }
 
         [HttpGet]
-        [Route("getSentries")]
+        [Route("getSentries/{pageNumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public async Task<IActionResult> GetAllSentries()
+        public async Task<IActionResult> GetAllSentries(int pageNumber)
         {
-            var result = await _customService.GetSentryListItemsAsync();
+            var result = await _customService.GetSentryListItemsAsync(pageNumber);
 
             if (!result.Any())
                 return NotFound("No sentries found, please check excel file.");

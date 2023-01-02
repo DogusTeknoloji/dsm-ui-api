@@ -10,7 +10,7 @@ namespace DSM.UI.Api.Services
 {
     public interface ICustomService
     {
-        Task<IList<SentryListItem>> GetSentryListItemsAsync();
+        Task<IList<SentryListItem>> GetSentryListItemsAsync(int pageNumber);
         Task<SentryListItem> GetSentryListItemAsync(int id);
         Task<SentryListItem> GetTodaySentryAsync();
         Task<IList<SentryListItem>> GetSentryWithTimeRangeAsync(int MonthRange);
@@ -19,15 +19,22 @@ namespace DSM.UI.Api.Services
     public class CustomService : ICustomService
     {
         private readonly DSMStorageDataContext _context;
+        private const int _pageItemCount = 400;
 
         public CustomService(DSMStorageDataContext context)
         {
             _context = context;
         }
 
-        public async Task<IList<SentryListItem>> GetSentryListItemsAsync()
+        public async Task<IList<SentryListItem>> GetSentryListItemsAsync(int pageNumber)
         {
-            return await _context.SentryListItems.ToListAsync();
+            var sentryListItems = await _context.SentryListItems
+                .OrderByDescending(s => s.Id)
+                .Skip((pageNumber - 1) * _pageItemCount)
+                .Take(_pageItemCount)
+                .ToListAsync();
+
+            return sentryListItems;
         }
 
         public async Task<SentryListItem> GetSentryListItemAsync(int id)
