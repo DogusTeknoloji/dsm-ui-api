@@ -7,9 +7,10 @@
         public string FromServer { get; set; }
         public string SourceIpPort { get; set; }
         public string LoadBalancerIP { get; set; }
-        public string FrontApp { get; set; }    
+        public string FrontApp { get; set; }
         public string DestinationURL { get; set; }
-        public string DestinationIP { get; set; }
-        public string DestinationPort { get; set; }
+        public string DestinationIP_Port { get; set; }
+        public string ServiceExplanation { get; set; }
+        public string IsFollowing { get; set; }
     }
 }
