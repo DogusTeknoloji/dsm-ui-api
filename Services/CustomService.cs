@@ -19,7 +19,7 @@ namespace DSM.UI.Api.Services
     public class CustomService : ICustomService
     {
         private readonly DSMStorageDataContext _context;
-        private const int _pageItemCount = 300;
+        private const int _pageItemCount = 400;
 
         public CustomService(DSMStorageDataContext context)
         {
