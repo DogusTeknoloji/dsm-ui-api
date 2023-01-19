@@ -9,5 +9,7 @@ namespace DSM.UI.Api.Models.Company
     {
         public int CompanyId { get; set; }
         public string Name { get; set; }
+        public int? ServerCount { get; set; }
+        public int? SiteCount { get; set; }
     }
 }
