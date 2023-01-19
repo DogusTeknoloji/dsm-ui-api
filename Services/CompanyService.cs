@@ -155,19 +155,23 @@ namespace DSM.UI.Api.Services
             int pageItemCount = 100;
             if (pagenumber < 2)
             {
-                var query = this._context.Companies.Where(x => x.Servers.Any()).Take(pageItemCount).Select(x => new SearchResult
+                var query = this._context.Companies.Where(x => x.Servers.Any()).Take(pageItemCount).ToList().Select(x => new SearchResult
                 {
                     CompanyId = x.CompanyId,
-                    Name = x.Name
+                    Name = x.Name,
+                    ServerCount = GetCompanyServerCount(x.CompanyId),
+                    SiteCount = GetCompanySiteCount(x.CompanyId)
                 });
                 return query;
             }
             else
             {
-                var query = this._context.Companies.Where(x => x.Servers.Any()).Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
+                var query = this._context.Companies.Where(x => x.Servers.Any()).Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).ToList().Select(x => new SearchResult
                 {
                     CompanyId = x.CompanyId,
-                    Name = x.Name
+                    Name = x.Name,
+                    ServerCount = GetCompanyServerCount(x.CompanyId),
+                    SiteCount = GetCompanySiteCount(x.CompanyId)
                 });
                 return query;
             }
