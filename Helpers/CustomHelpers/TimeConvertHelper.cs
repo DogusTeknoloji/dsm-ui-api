@@ -1,4 +1,6 @@
-﻿namespace DSM.UI.Api.Helpers.CustomHelpers
+﻿using System;
+
+namespace DSM.UI.Api.Helpers.CustomHelpers
 {
     public static class TimeConvertHelper
     {
@@ -35,6 +37,14 @@
                 12 => "Aralık",
                 _ => "Ocak"
             };
+        }
+        
+        public static int compareMonths(string month1, string month2)
+        {
+            string[] months = { "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık" };
+            var month1Index = Array.IndexOf(months, month1);
+            var month2Index = Array.IndexOf(months, month2);
+            return month1Index - month2Index;
         }
     }
 }

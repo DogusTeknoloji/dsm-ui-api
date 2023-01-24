@@ -203,7 +203,7 @@ namespace DSM.UI.Api.Services
             if (term == null)
             {
                 var query = this._context.Companies;
-                results = query.ToList().Select(x => new SearchResult { CompanyId = x.CompanyId, Name = x.Name });
+                results = query.ToList().Select(x => new SearchResult { CompanyId = x.CompanyId, Name = x.Name, ServerCount = GetCompanyServerCount(x.CompanyId), SiteCount = GetCompanySiteCount(x.CompanyId) });
             }
             else
             {
@@ -211,7 +211,7 @@ namespace DSM.UI.Api.Services
 
                 var query = from a in _context.Companies select a;
                 query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
-                results = query.ToList().Select(x => new SearchResult { CompanyId = x.CompanyId, Name = x.Name });
+                results = query.ToList().Select(x => new SearchResult { CompanyId = x.CompanyId, Name = x.Name, ServerCount = GetCompanyServerCount(x.CompanyId), SiteCount = GetCompanySiteCount(x.CompanyId) });
             }
 
             return ExcelOperations.ExportToExcel(results);

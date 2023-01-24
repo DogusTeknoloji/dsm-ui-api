@@ -25,7 +25,7 @@ namespace DSM.UI.Api.Controllers
             if (!result.Any())
                 return NotFound("No sentries found, please check excel file.");
 
-            return Ok(result);
+            return Ok(result.Reverse());
         }
 
         [HttpGet]
