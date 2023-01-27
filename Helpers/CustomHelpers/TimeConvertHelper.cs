@@ -18,7 +18,7 @@ namespace DSM.UI.Api.Helpers.CustomHelpers
                 _ => "Pazartesi"
             };
         }
-        
+
         public static string convertMonthToTurkish(this int month)
         {
             return month switch
@@ -38,13 +38,37 @@ namespace DSM.UI.Api.Helpers.CustomHelpers
                 _ => "Ocak"
             };
         }
-        
+
         public static int compareMonths(string month1, string month2)
         {
-            string[] months = { "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık" };
+            string[] months =
+            {
+                "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım",
+                "Aralık"
+            };
             var month1Index = Array.IndexOf(months, month1);
             var month2Index = Array.IndexOf(months, month2);
             return month1Index - month2Index;
+        }
+
+        public static int getMonthNumber(string month)
+        {
+            return month switch
+            {
+                "Ocak" => 1,
+                "Şubat" => 2,
+                "Mart" => 3,
+                "Nisan" => 4,
+                "Mayıs" => 5,
+                "Haziran" => 6,
+                "Temmuz" => 7,
+                "Ağustos" => 8,
+                "Eylül" => 9,
+                "Ekim" => 10,
+                "Kasım" => 11,
+                "Aralık" => 12,
+                _ => 0
+            };
         }
     }
 }
