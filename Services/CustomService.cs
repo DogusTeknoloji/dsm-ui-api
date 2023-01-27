@@ -19,7 +19,7 @@ namespace DSM.UI.Api.Services
     public class CustomService : ICustomService
     {
         private readonly DSMStorageDataContext _context;
-        private const int _pageItemCount = 500;
+        private const int _pageItemCount = 365;
 
         public CustomService(DSMStorageDataContext context)
         {
@@ -29,10 +29,16 @@ namespace DSM.UI.Api.Services
         public async Task<IList<SentryListItem>> GetSentryListItemsAsync(int pageNumber)
         {
             var sentryListItems = await _context.SentryListItems
+                .Where(s => s.DayNumber != 0 && s.Month != "0" && s.Year != 0)
                 .OrderByDescending(s => s.Id)
                 .Skip((pageNumber - 1) * _pageItemCount)
                 .Take(_pageItemCount)
                 .ToListAsync();
+
+            sentryListItems
+                .OrderBy(s => s.Year)
+                .ThenBy(s => TimeConvertHelper.getMonthNumber(s.Month))
+                .ThenBy(s => s.DayNumber);
 
             return sentryListItems;
         }
@@ -55,19 +61,20 @@ namespace DSM.UI.Api.Services
         public async Task<IList<SentryListItem>> GetSentryWithTimeRangeAsync(int MonthRange)
         {
             var today = DateTime.Today;
-            
+
             var MonthNames = new List<string>();
-            
+
             for (var i = 0; i < MonthRange; i++)
             {
-                if(today.Month + i <= 12)
+                if (today.Month + i <= 12)
                     MonthNames.Add(today.AddMonths(i).Month.convertMonthToTurkish());
-                
+
                 if (today.Month - i >= 0)
                     MonthNames.Add(today.AddMonths(-i).Month.convertMonthToTurkish());
             }
-            
-            return await _context.SentryListItems.Where(x => MonthNames.Distinct().Contains(x.Month) && x.Year == today.Year).ToListAsync();
+
+            return await _context.SentryListItems
+                .Where(x => MonthNames.Distinct().Contains(x.Month) && x.Year == today.Year).ToListAsync();
         }
     }
 }
