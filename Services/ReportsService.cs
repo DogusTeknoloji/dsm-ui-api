@@ -9,8 +9,9 @@ namespace DSM.UI.Api.Services
 {
     public interface IReportsService
     {
-        IEnumerable<KPIMetricsView> GetKpiItems(int pagenumber);
+        IEnumerable<KPIMetricsView> GetKpiItems();
         IEnumerable<KPIMetricsView> GetKpiItemsWithTerm(object term, int pagenumber);
+        IEnumerable<string> GetKpiItemsApplicationNames();
         IEnumerable<OverallDiskStatusItem> GetOverallDiskStatus(int pagenumber);
         IEnumerable<OverallDiskStatusItem> SearchOverallDiskStatus(object term);
         byte[] DownloadOverallDiskStatus();
@@ -129,8 +130,9 @@ namespace DSM.UI.Api.Services
                         VolumeName = x.DiskName,
                         DiskCapacity = string.Format(_numberFormat, x.DiskCapacity) + " MB",
                         FreeDiskSpace = x.DiskFreeSpace.ToString() + " MB (% " +
-                                         string.Format("{0:0.##}", 100 * (float) x.DiskFreeSpace / (float)x.DiskCapacity) + ")",
-                        FreePercentage = (int) (100 * (float) x.DiskFreeSpace / (float)x.DiskCapacity),
+                                        string.Format("{0:0.##}",
+                                            100 * (float)x.DiskFreeSpace / (float)x.DiskCapacity) + ")",
+                        FreePercentage = (int)(100 * (float)x.DiskFreeSpace / (float)x.DiskCapacity),
                         UsedDiskSpace = string.Format(_numberFormat, x.DiskCapacity - x.DiskFreeSpace) + " MB",
                         Responsible = x.Server.Responsible
                     }).ToList();
@@ -399,35 +401,12 @@ namespace DSM.UI.Api.Services
             return ExcelOperations.ExportToExcel(results);
         }
 
-        public IEnumerable<KPIMetricsView> GetKpiItems(int pagenumber)
+        public IEnumerable<KPIMetricsView> GetKpiItems()
         {
             var query = from kpi in this._context.KPIMetricsViews
-                select new KPIMetricsView
-                {
-                    Application = kpi.Application,
-                    Year = kpi.Year,
-                    Ocak = kpi.Ocak,
-                    Subat = kpi.Subat,
-                    Mart = kpi.Mart,
-                    Nisan = kpi.Nisan,
-                    Mayis = kpi.Mayis,
-                    Haziran = kpi.Haziran,
-                    Temmuz = kpi.Temmuz,
-                    Agustos = kpi.Agustos,
-                    Eylul = kpi.Eylul,
-                    Ekim = kpi.Ekim,
-                    Kasim = kpi.Kasim,
-                    Aralik = kpi.Aralik
-                };
+                select kpi;
 
-            if (pagenumber < 2)
-            {
-                return query.Take(_pageItemCount).AsEnumerable().Distinct();
-            }
-            else
-            {
-                return query.Skip((pagenumber - 1) * _pageItemCount).Take(_pageItemCount).AsEnumerable().Distinct();
-            }
+            return query.AsEnumerable();
         }
 
         public IEnumerable<KPIMetricsView> GetKpiItemsWithTerm(object term, int pagenumber)
@@ -464,6 +443,14 @@ namespace DSM.UI.Api.Services
             {
                 return query.Skip((pagenumber - 1) * _pageItemCount).Take(_pageItemCount).AsEnumerable().Distinct();
             }
+        }
+
+        public IEnumerable<string> GetKpiItemsApplicationNames()
+        {
+            var query = from kpi in this._context.KPIMetricsViews
+                select kpi.Application;
+
+            return query.ToList().Distinct();
         }
     }
 }

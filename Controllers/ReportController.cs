@@ -130,11 +130,11 @@ namespace DSM.UI.Api.Controllers
             return File(exportData, "application/octet-stream");
         }
 
-        [HttpGet("kpistatus/{pagenumber}")]
+        [HttpGet("kpistatus/")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
-        public IActionResult KPIMetricsView(int pagenumber)
+        public IActionResult KPIMetricsView()
         {
-            var KPIStatusList = this._reportsService.GetKpiItems(pagenumber);
+            var KPIStatusList = this._reportsService.GetKpiItems();
             if (KPIStatusList == null) return BadRequest(InvalidOperationError.GetInstance());
 
             return this.Ok(KPIStatusList);
@@ -149,6 +149,16 @@ namespace DSM.UI.Api.Controllers
             if (KPIStatusList == null) return BadRequest(InvalidOperationError.GetInstance());
 
             return this.Ok(KPIStatusList);
+        }
+        
+        [HttpGet("kpistatus/applicationNames")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public IActionResult GetApplicationNames()
+        {
+            var applicationNames = this._reportsService.GetKpiItemsApplicationNames();
+            if (applicationNames == null) return BadRequest(InvalidOperationError.GetInstance());
+
+            return this.Ok(applicationNames);
         }
 
         [HttpGet("odmstatusreport/{pagenumber}")]
