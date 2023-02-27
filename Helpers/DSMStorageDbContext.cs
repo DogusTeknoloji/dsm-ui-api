@@ -13,12 +13,14 @@ using DSM.UI.Api.Models.Reports;
 using DSM.UI.Api.Models.Server;
 using DSM.UI.Api.Models.UploadedFiles;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DSM.UI.Api
 {
     public class DSMStorageDataContext : DbContext
     {
         private static DSMStorageDataContext _instance;
+        private string _connectionString;
         public static DSMStorageDataContext GetInstance()
         {
             if (_instance == null)
@@ -33,6 +35,12 @@ namespace DSM.UI.Api
 
         public DSMStorageDataContext(DbContextOptions options) : base(options)
         {
+        }
+
+        public DSMStorageDataContext(string connectionString)
+        {
+            this._connectionString = connectionString;
+            this.Database.SetCommandTimeout(TimeSpan.FromMinutes(1));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

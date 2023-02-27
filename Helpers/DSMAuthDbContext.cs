@@ -2,12 +2,20 @@
 using DSM.UI.Api.Models.User;
 using DSM.UI.Api.Models.WebAccessLogs;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DSM.UI.Api.Helpers
 {
     public class DSMAuthDbContext : DbContext
     {
+        private string _connectionString;
         public DSMAuthDbContext(DbContextOptions<DSMAuthDbContext> options) : base(options) { }
+
+        public DSMAuthDbContext(string connectionString)
+        {
+            this._connectionString = connectionString;
+            this.Database.SetCommandTimeout(TimeSpan.FromMinutes(1));
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
