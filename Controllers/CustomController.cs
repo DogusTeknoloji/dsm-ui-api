@@ -55,6 +55,19 @@ namespace DSM.UI.Api.Controllers
         }
         
         [HttpGet]
+        [Route("getNextWeeksSentry")]
+        [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
+        public async Task<IActionResult> GetNextWeeksSentry()
+        {
+            var result = await _customService.GetNextWeeksSentryAsync();
+
+            if (result == null)
+                return NotFound("No sentry for today, please check excel file.");
+
+            return Ok(result);
+        }
+        
+        [HttpGet]
         [Route("getSentryByMonthRange/")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]
         public async Task<IActionResult> GetSentryWithTimeRangeAsync(int monthRange = 1)

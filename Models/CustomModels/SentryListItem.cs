@@ -13,5 +13,7 @@
         public string Security { get; set; }
         public string DB { get; set; }
         public string ApplicationManagement { get; set; }
+        public string CyberSecurity { get; set; }
+
     }
 }
