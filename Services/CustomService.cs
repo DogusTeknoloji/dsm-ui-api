@@ -13,6 +13,7 @@ namespace DSM.UI.Api.Services
         Task<IList<SentryListItem>> GetSentryListItemsAsync(int pageNumber);
         Task<SentryListItem> GetSentryListItemAsync(int id);
         Task<SentryListItem> GetTodaySentryAsync();
+        Task<SentryListItem> GetNextWeeksSentryAsync();
         Task<IList<SentryListItem>> GetSentryWithTimeRangeAsync(int MonthRange);
     }
 
@@ -51,6 +52,16 @@ namespace DSM.UI.Api.Services
         public async Task<SentryListItem> GetTodaySentryAsync()
         {
             var today = DateTime.Today;
+
+            var monthInTurkish = today.Month.convertMonthToTurkish();
+
+            return await _context.SentryListItems.FirstOrDefaultAsync(x =>
+                x.Month.Contains(monthInTurkish) && x.DayNumber == today.Day && x.Year == today.Year);
+        }
+
+        public async Task<SentryListItem> GetNextWeeksSentryAsync()
+        {
+            var today = DateTime.Today.AddDays(7);
 
             var monthInTurkish = today.Month.convertMonthToTurkish();
 
