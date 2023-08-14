@@ -143,6 +143,7 @@ namespace DSM.UI.Api
             services.AddScoped<ICustomerTrackingService, CustomerTrackingService>();
             services.AddScoped<IInventoryTrackingService, InventoryTrackingService>();
             services.AddScoped<ICustomService, CustomService>();
+            services.AddScoped<ICustomInventoryService, CustomInventoryService>();
             services.AddScoped<IFileUploadService, FileUploadService>();
             
             services.AddScoped<IDSMOperationLogger, DSMOperationLogger>();
