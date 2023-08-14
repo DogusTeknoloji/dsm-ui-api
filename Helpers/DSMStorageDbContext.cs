@@ -3,6 +3,7 @@ using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.AzureDevOps;
 using DSM.UI.Api.Models.Company;
 using DSM.UI.Api.Models.CustomerUrlLists;
+using DSM.UI.Api.Models.CustomInventories;
 using DSM.UI.Api.Models.CustomModels;
 using DSM.UI.Api.Models.Dashboard;
 using DSM.UI.Api.Models.DatabasePortal;
@@ -19,14 +20,17 @@ namespace DSM.UI.Api
     public class DSMStorageDataContext : DbContext
     {
         private static DSMStorageDataContext _instance;
+
         public static DSMStorageDataContext GetInstance()
         {
             if (_instance == null)
             {
                 _instance = new DSMStorageDataContext();
             }
+
             return _instance;
         }
+
         protected DSMStorageDataContext()
         {
         }
@@ -230,7 +234,6 @@ namespace DSM.UI.Api
 
             modelBuilder.Entity<SitePackage>(entity =>
             {
-
                 entity.ToTable("IISSitePackageVersion");
 
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -240,9 +243,9 @@ namespace DSM.UI.Api
                 entity.Property(e => e.Version).HasMaxLength(100);
 
                 entity.HasOne(e => e.Site)
-                      .WithMany(d => d.Packages)
-                      .HasForeignKey(e => e.SiteId)
-                      .HasConstraintName("FK_IISSitePackageVersion_IISSite");
+                    .WithMany(d => d.Packages)
+                    .HasForeignKey(e => e.SiteId)
+                    .HasConstraintName("FK_IISSitePackageVersion_IISSite");
             });
 
             modelBuilder.Entity<SiteWebConfiguration>(entity =>
@@ -270,10 +273,9 @@ namespace DSM.UI.Api
                 entity.ToTable("ServerInventoryX");
 
                 entity.HasOne(x => x.Company)
-                .WithMany(x => x.Servers)
-                .HasForeignKey(x => x.CompanyId)
-                .HasConstraintName("FK_ServerInventory_ServerInventory");
-
+                    .WithMany(x => x.Servers)
+                    .HasForeignKey(x => x.CompanyId)
+                    .HasConstraintName("FK_ServerInventory_ServerInventory");
             });
 
             modelBuilder.Entity<Company>(entity =>
@@ -282,18 +284,15 @@ namespace DSM.UI.Api
                 entity.ToTable("Companies");
             });
 
-            modelBuilder.Entity<ApplicationServer>(entity =>
-            {
-                entity.ToTable("ApplicationServerInventory");
-            });
+            modelBuilder.Entity<ApplicationServer>(entity => { entity.ToTable("ApplicationServerInventory"); });
 
             modelBuilder.Entity<ServerDisk>(entity =>
             {
                 entity.ToTable("DiskStatus");
                 entity.HasKey("DiskId");
                 entity.HasOne(x => x.Server)
-                .WithMany(x => x.ServerDisks)
-                .HasForeignKey(x => x.ServerId);
+                    .WithMany(x => x.ServerDisks)
+                    .HasForeignKey(x => x.ServerId);
             });
 
             modelBuilder.Entity<KPIMetricsView>(entity =>
@@ -355,13 +354,13 @@ namespace DSM.UI.Api
                 entity.HasKey("Id");
                 entity.ToTable("VdfAppDbInventory");
             });
-            
+
             modelBuilder.Entity<CustomerExternalUrl>(entity =>
             {
                 entity.HasKey("Id");
                 entity.ToTable("VdfExternalUrls");
             });
-            
+
             modelBuilder.Entity<CustomerInternalUrl>(entity =>
             {
                 entity.HasKey("Id");
@@ -379,7 +378,7 @@ namespace DSM.UI.Api
                 entity.HasKey("Id");
                 entity.ToTable("UpdatedSiteInventory");
             });
-            
+
             modelBuilder.Entity<DetailedServerInventoryItem>(entity =>
             {
                 entity.HasKey("Id");
@@ -391,13 +390,31 @@ namespace DSM.UI.Api
                 entity.HasKey("Id");
                 entity.ToTable("DTNobetCizelgesi");
             });
-            
+
             modelBuilder.Entity<UploadedFileDetail>(entity =>
             {
                 entity.HasKey("Id");
                 entity.ToTable("UploadedFiles");
             });
+
+            modelBuilder.Entity<NetworkSecurityInventoryItem>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToTable("NetworkSecurityNodes");
+            });
+
+            modelBuilder.Entity<NetworkInventoryItem>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToTable("NetworkNodes");
+            });
             
+            modelBuilder.Entity<FrameworkVersionInventoryItem>(entity =>
+            {
+                entity.HasKey("id");
+                entity.ToTable("FrameworkVersions");
+            });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -428,7 +445,11 @@ namespace DSM.UI.Api
         public DbSet<DetailedServerInventoryItem> DetailedServerInventoryItems { get; set; }
         public DbSet<SentryListItem> SentryListItems { get; set; }
         public DbSet<UploadedFileDetail> UploadedFileDetails { get; set; }
-        public DbSet<OperationLog> OperationLogs { get; set; } 
+        public DbSet<OperationLog> OperationLogs { get; set; }
+
+        public DbSet<NetworkSecurityInventoryItem> NetworkSecurityInventoryItems { get; set; }
+        public DbSet<NetworkInventoryItem> NetworkInventoryItems { get; set; }
         
+        public DbSet<FrameworkVersionInventoryItem> FrameworkVersionInventoryItems { get; set; }
     }
 }
