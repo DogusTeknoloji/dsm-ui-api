@@ -26,7 +26,7 @@ namespace DSM.UI.Api.Controllers
             var searchResults = _siteService.SearchSites(term);
             if (searchResults == null)
                 return this.BadRequest(new { message = "Invalid search term" });
-
+    
             return Ok(searchResults);
         }
 

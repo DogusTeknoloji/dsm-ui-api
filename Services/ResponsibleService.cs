@@ -71,20 +71,21 @@ namespace DSM.UI.Api.Services
                .Distinct()
                .ToList()
                .Select(server =>
-                   new DetailsServers
-                   {
-                       ServerId = server.ServerId,
-                       ApplicationType = server.ServiceName,
-                       ServerName = server.ServerName,
-                       Contact = server.Responsible,
-                       Environments = server.ServerType,
-                       FullName = server.HostName,
-                       IpAddress = server.IpAddress,
-                       LastBackupDate = server.LastBackup.ToString(),
-                       OperatingSystem = server.OperatingSystem,
-                       Owner = GetServerCompany(server.CompanyId)
-                   }
-               ).Distinct();
+               {
+                       return new DetailsServers
+                       {
+                           ServerId = server.ServerId,
+                           ApplicationType = server.ServiceName,
+                           ServerName = server.ServerName,
+                           Contact = server.Responsible,
+                           Environments = server.ServerType,
+                           FullName = server.HostName,
+                           IpAddress = server.IpAddress,
+                           LastBackupDate = server.LastBackup.ToString(),
+                           OperatingSystem = server.OperatingSystem,
+                           Owner = GetServerCompany((int)server.CompanyId!)
+                       };
+               }).Distinct();
         }
 
         public IEnumerable<DetailsSites> GetDetailsSites(string responsibleName)
