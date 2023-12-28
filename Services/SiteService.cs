@@ -288,6 +288,7 @@ namespace DSM.UI.Api.Services
             {
                 IEnumerable<PropertyInfo> stringProperties = typeof(Site).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
+                
                 var query = from a in _context.Sites select a;
                 query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
 
