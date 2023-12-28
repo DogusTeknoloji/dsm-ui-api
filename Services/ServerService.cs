@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using DocumentFormat.OpenXml.Office2013.Excel;
+using Microsoft.EntityFrameworkCore;
 
 namespace DSM.UI.Api.Services
 {
@@ -305,15 +306,18 @@ namespace DSM.UI.Api.Services
             if (term == null)
             {
                 var query = _context.Servers;
-                results = query.ToList().Select(x => new SearchResult
+                
+                results = query.Include(server => server.Company).ToList().Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,
-                    CompanyName = x.Company.Name,
-                    DnsName = x.HostName,
-                    IpAddress = x.IpAddress,
                     MachineName = x.ServerName,
+                    IpAddress = x.IpAddress,
+                    DnsName = x.HostName,
+                    CompanyName = x.Company?.Name ?? "Check Company on DSM",
                     OperatingSystem = x.OperatingSystem,
-                    Responsible = x.Responsible
+                    Responsible = x.Responsible,
+                    ServiceName = x.ServiceName,
+                    Notes = x.Notes,
                 });
             }
             else
@@ -326,16 +330,18 @@ namespace DSM.UI.Api.Services
 
                 results = query.ToList().Select(x => new SearchResult
                 {
-                    CompanyName = x.Company.Name,
-                    DnsName = x.HostName,
-                    IpAddress = x.IpAddress,
+                    ServerId = x.ServerId,
                     MachineName = x.ServerName,
+                    IpAddress = x.IpAddress,
+                    DnsName = x.HostName,
+                    CompanyName = x.Company?.Name,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible,
-                    ServerId = x.ServerId
+                    ServiceName = x.ServiceName,
+                    Notes = x.Notes,
                 });
             }
-
+            
             return ExcelOperations.ExportToExcel(results);
         }
 
