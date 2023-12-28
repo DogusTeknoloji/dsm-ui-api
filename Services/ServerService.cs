@@ -7,9 +7,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using DocumentFormat.OpenXml.Office2013.Excel;
-using Microsoft.EntityFrameworkCore;
 
 namespace DSM.UI.Api.Services
 {
@@ -32,12 +29,10 @@ namespace DSM.UI.Api.Services
     public class ServerService : IServerService
     {
         private readonly DSMStorageDataContext _context;
-
         public ServerService(DSMStorageDataContext context)
         {
             _context = context;
         }
-
         public DetailsGeneral GetDetailsGeneral(int id)
         {
             Server result = this._context.Servers.FirstOrDefault(x => x.ServerId == id);
@@ -55,8 +50,7 @@ namespace DSM.UI.Api.Services
                 siteCount = 0;
             }
 
-            string lastCheckDate = this._context.VCenterLogs.Where(x => x.LogName == "DiskStatus")
-                .Select(x => x.LogValue).FirstOrDefault();
+            string lastCheckDate = this._context.VCenterLogs.Where(x => x.LogName == "DiskStatus").Select(x => x.LogValue).FirstOrDefault();
             lastCheckDate = Convert.ToDateTime(lastCheckDate).ToString(CultureInfo.InvariantCulture);
             string noData = "No-Data";
             string comingSoon = "#COMING_SOON#";
@@ -81,17 +75,9 @@ namespace DSM.UI.Api.Services
                 ServiceName = result.ServiceName,
                 ToolsRunningStatus = result.ToolsRunningStatus,
                 OnlineSiteCount = siteCount == 0 ? "0" : comingSoon,
-                TotalCapacity = result.ServerDisks.Count > 0
-                    ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.DiskCapacity))) + " MB"
-                    : noData,
-                PercentFree = result.ServerDisks.Count > 0
-                    ? ((100 * result.ServerDisks.Sum(x => x.DiskFreeSpace) /
-                        result.ServerDisks.Sum(x => x.DiskCapacity))).ToString() + "% (" +
-                      string.Format(numberFormat, result.ServerDisks.Sum(x => x.DiskFreeSpace)) + " MB)"
-                    : noData,
-                Volumes = result.ServerDisks.Count > 0
-                    ? string.Join(", ", result.ServerDisks.Select(x => x.DiskName).ToArray())
-                    : noData,
+                TotalCapacity = result.ServerDisks.Count > 0 ? string.Format(numberFormat, (result.ServerDisks?.Sum(x => x.DiskCapacity))) + " MB" : noData,
+                PercentFree = result.ServerDisks.Count > 0 ? ((100 * result.ServerDisks.Sum(x => x.DiskFreeSpace) / result.ServerDisks.Sum(x => x.DiskCapacity))).ToString() + "% (" + string.Format(numberFormat, result.ServerDisks.Sum(x => x.DiskFreeSpace)) + " MB)" : noData,
+                Volumes = result.ServerDisks.Count > 0 ? string.Join(", ", result.ServerDisks.Select(x => x.DiskName).ToArray()) : noData,
                 LastCheckDate = lastCheckDate,
                 VolumeDetails = result.ServerDisks.Select(x => new DetailsVolume
                 {
@@ -110,17 +96,17 @@ namespace DSM.UI.Api.Services
             Server serverX = this._context.Servers.Find(id);
             if (serverX == null) return null;
             var query = from site in _context.Sites
-                join server in _context.Servers on site.MachineName equals server.ServerName
-                where site.MachineName == serverX.ServerName
-                select new DetailsSites
-                {
-                    SiteId = site.SiteId,
-                    SiteName = site.Name,
-                    State = site.State,
-                    Domains = server.HostName,
-                    PhysicalPath = site.PhysicalPath,
-                    AppType = site.AppType
-                };
+                        join server in _context.Servers on site.MachineName equals server.ServerName
+                        where site.MachineName == serverX.ServerName
+                        select new DetailsSites
+                        {
+                            SiteId = site.SiteId,
+                            SiteName = site.Name,
+                            State = site.State,
+                            Domains = server.HostName,
+                            PhysicalPath = site.PhysicalPath,
+                            AppType = site.AppType
+                        };
 
             return query.Distinct();
         }
@@ -141,8 +127,7 @@ namespace DSM.UI.Api.Services
 
         public IEnumerable<string> GetLetters()
         {
-            var firstLetters = this._context.Servers.GroupBy(s => s.ServerName.Substring(0, 1))
-                .Select(x => x.Key.ToUpper()).ToList();
+            var firstLetters = this._context.Servers.GroupBy(s => s.ServerName.Substring(0, 1)).Select(x => x.Key.ToUpper()).ToList();
             firstLetters = firstLetters.OrderBy(x => x).ToList();
             firstLetters.Add("Tümü");
             return firstLetters;
@@ -152,16 +137,13 @@ namespace DSM.UI.Api.Services
         {
             return this.GetServers(pagenumber, null, -1);
         }
-
         public IEnumerable<SearchResult> GetServers(int pagenumber, string fieldName, int orderPosition)
         {
             var orderQuery = from a in this._context.Servers select a;
 
             if (!(fieldName is null) && orderPosition != -1)
             {
-                PropertyInfo orderColumn = typeof(Server).GetProperties().FirstOrDefault(prop =>
-                    prop.Name.ToLower(CultureInfo.GetCultureInfo("en-US")) ==
-                    fieldName.ToLower(CultureInfo.GetCultureInfo("en-US")));
+                PropertyInfo orderColumn = typeof(Server).GetProperties().FirstOrDefault(prop => prop.Name.ToLower(CultureInfo.GetCultureInfo("en-US")) == fieldName.ToLower(CultureInfo.GetCultureInfo("en-US")));
                 if (orderColumn == null) return null;
                 orderQuery = EntityQueryable.OrderBy(orderQuery, orderColumn.Name, orderPosition == 1 ? false : true);
                 orderQuery = orderQuery.AsEnumerable().AsQueryable();
@@ -185,18 +167,17 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = orderQuery.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x =>
-                    new SearchResult
-                    {
-                        ServerId = x.ServerId,
-                        CompanyName = x.Company.Name,
-                        DnsName = x.HostName,
-                        IpAddress = x.IpAddress,
-                        MachineName = x.ServerName,
-                        OperatingSystem = x.OperatingSystem,
-                        Responsible = x.Responsible,
-                        ServiceName = x.ServiceName
-                    });
+                var query = orderQuery.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
+                {
+                    ServerId = x.ServerId,
+                    CompanyName = x.Company.Name,
+                    DnsName = x.HostName,
+                    IpAddress = x.IpAddress,
+                    MachineName = x.ServerName,
+                    OperatingSystem = x.OperatingSystem,
+                    Responsible = x.Responsible,
+                    ServiceName = x.ServiceName
+                });
                 return query;
             }
         }
@@ -223,125 +204,81 @@ namespace DSM.UI.Api.Services
             }
             else
             {
-                var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x =>
-                    new SearchResult
-                    {
-                        ServerId = x.ServerId,
-                        CompanyName = x.Company.Name,
-                        DnsName = x.HostName,
-                        IpAddress = x.IpAddress,
-                        MachineName = x.ServerName,
-                        OperatingSystem = x.OperatingSystem,
-                        Responsible = x.Responsible,
-                        ServiceName = x.ServiceName
-                    });
+                var query = records.Skip((pagenumber - 1) * pageItemCount).Take(pageItemCount).Select(x => new SearchResult
+                {
+                    ServerId = x.ServerId,
+                    CompanyName = x.Company.Name,
+                    DnsName = x.HostName,
+                    IpAddress = x.IpAddress,
+                    MachineName = x.ServerName,
+                    OperatingSystem = x.OperatingSystem,
+                    Responsible = x.Responsible,
+                    ServiceName = x.ServiceName
+                });
                 return query.Distinct();
             }
         }
 
         public IEnumerable<SearchResult> SearchServers(object term)
         {
-            IEnumerable<PropertyInfo> stringProperties =
-                typeof(Server).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+            IEnumerable<PropertyInfo> stringProperties = typeof(Server).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
-            var results = new List<SearchResult>();
+            var query = from a in _context.Servers select a;
+            query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
 
-            var serverCount = _context.Servers.Count();
-            var sharding = (int)Math.Round((decimal)serverCount / 20);
+            var results = query.ToList();
 
-
-            for (int i = 0; i <= 20; i++)
+            return results.Select(x => new SearchResult
             {
-                    var servers = _context.Servers.Skip(i * sharding).Take(sharding);
-                    var query = EntityQueryable.WhereContains(servers, fields: stringProperties, term.ToString());
-                try
-                {
-                    results.AddRange(query.ToList().Select(x => new SearchResult
-                    {
-                        CompanyName = x.Company != null ? x.Company.Name : "Null",
-                        DnsName = x.HostName,
-                        IpAddress = x.IpAddress,
-                        MachineName = x.ServerName,
-                        OperatingSystem = x.OperatingSystem,
-                        Responsible = x.Responsible,
-                        ServiceName = x.ServiceName,
-                        ServerId = x.ServerId
-                    }));
-                    
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Sharding => " + i + " Error => " + e.Message);
-                }
-            }
-
-
-            // var query = from a in _context.Servers select a;
-
-            // query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
-
-            // return results.Select(x => new SearchResult
-            // {
-            //     CompanyName = x.Company.Name,
-            //     DnsName = x.HostName,
-            //     IpAddress = x.IpAddress,
-            //     MachineName = x.ServerName,
-            //     OperatingSystem = x.OperatingSystem,
-            //     Responsible = x.Responsible,
-            //     ServiceName = x.ServiceName,
-            //     ServerId = x.ServerId
-            // });
-
-            return results;
+                CompanyName = x.Company.Name,
+                DnsName = x.HostName,
+                IpAddress = x.IpAddress,
+                MachineName = x.ServerName,
+                OperatingSystem = x.OperatingSystem,
+                Responsible = x.Responsible,
+                ServiceName = x.ServiceName,
+                ServerId = x.ServerId
+            });
         }
-
         public byte[] DownloadServers()
         {
             return this.DownloadServers(null);
         }
-
         public byte[] DownloadServers(object term)
         {
             IEnumerable<SearchResult> results = null;
             if (term == null)
             {
                 var query = _context.Servers;
-                
-                results = query.Include(server => server.Company).ToList().Select(x => new SearchResult
+                results = query.ToList().Select(x => new SearchResult
                 {
                     ServerId = x.ServerId,
-                    MachineName = x.ServerName,
-                    IpAddress = x.IpAddress,
+                    CompanyName = x.Company.Name,
                     DnsName = x.HostName,
-                    CompanyName = x.Company?.Name ?? "Check Company on DSM",
+                    IpAddress = x.IpAddress,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
-                    Responsible = x.Responsible,
-                    ServiceName = x.ServiceName,
-                    Notes = x.Notes,
+                    Responsible = x.Responsible
                 });
             }
             else
             {
-                IEnumerable<PropertyInfo> stringProperties =
-                    typeof(Server).GetProperties().Where(prop => prop.PropertyType == term.GetType());
+                IEnumerable<PropertyInfo> stringProperties = typeof(Server).GetProperties().Where(prop => prop.PropertyType == term.GetType());
 
                 var query = from a in _context.Servers select a;
                 query = EntityQueryable.WhereContains(query, fields: stringProperties, term.ToString());
 
                 results = query.ToList().Select(x => new SearchResult
                 {
-                    ServerId = x.ServerId,
-                    MachineName = x.ServerName,
-                    IpAddress = x.IpAddress,
+                    CompanyName = x.Company.Name,
                     DnsName = x.HostName,
-                    CompanyName = x.Company?.Name,
+                    IpAddress = x.IpAddress,
+                    MachineName = x.ServerName,
                     OperatingSystem = x.OperatingSystem,
                     Responsible = x.Responsible,
-                    ServiceName = x.ServiceName,
-                    Notes = x.Notes,
+                    ServerId = x.ServerId
                 });
             }
-            
             return ExcelOperations.ExportToExcel(results);
         }
 
