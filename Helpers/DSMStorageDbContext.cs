@@ -1,4 +1,4 @@
-﻿using DSM.Core.Models;
+using DSM.Core.Models;
 using DSM.UI.Api.Models;
 using DSM.UI.Api.Models.AzureDevOps;
 using DSM.UI.Api.Models.Company;
@@ -408,7 +408,7 @@ namespace DSM.UI.Api
                 entity.HasNoKey();
                 entity.ToTable("NetworkNodes");
             });
-            
+
             modelBuilder.Entity<FrameworkVersionInventoryItem>(entity =>
             {
                 entity.HasKey("id");
@@ -420,7 +420,6 @@ namespace DSM.UI.Api
                 entity.HasNoKey();
                 entity.ToTable("EMBindingInventory");
             });
-
 
             base.OnModelCreating(modelBuilder);
         }
@@ -453,12 +452,11 @@ namespace DSM.UI.Api
         public DbSet<SentryListItem> SentryListItems { get; set; }
         public DbSet<UploadedFileDetail> UploadedFileDetails { get; set; }
         public DbSet<OperationLog> OperationLogs { get; set; }
-        
 
         public DbSet<NetworkSecurityInventoryItem> NetworkSecurityInventoryItems { get; set; }
         public DbSet<NetworkInventoryItem> NetworkInventoryItems { get; set; }
         public DbSet<EMBindingInventoryItem> EmBindingInventoryItems { get; set; }
         public DbSet<FrameworkVersionInventoryItem> FrameworkVersionInventoryItems { get; set; }
-        
+
     }
 }

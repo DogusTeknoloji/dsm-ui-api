@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +10,7 @@ using DSM.UI.Api.Helpers.CustomHelpers;
 using DSM.UI.Api.Models.CustomInventories;
 using DSM.UI.Api.Models.CustomModels;
 using DSM.UI.Api.Models.Server;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace DSM.UI.Api.Services

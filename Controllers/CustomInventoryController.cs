@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DSM.UI.Api.Helpers;
@@ -55,7 +55,7 @@ namespace DSM.UI.Api.Controllers
 
             return Ok(result);
         }
-        
+
         [HttpGet]
         [Route("EMBindingInventory/{pageNumber}")]
         [Authorize(Roles = "Member, Spectator, Manager, Administrator, CIFANG")]

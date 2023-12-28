@@ -1,4 +1,4 @@
-﻿using DSM.UI.Api.Helpers;
+using DSM.UI.Api.Helpers;
 using DSM.UI.Api.Helpers.RemoteDesktop;
 using DSM.UI.Api.Helpers.RemoteDesktop.Models;
 using DSM.UI.Api.Models.Server;
@@ -249,7 +249,6 @@ namespace DSM.UI.Api.Services
             var serverCount = _context.Servers.Count();
             var sharding = (int)Math.Round((decimal)serverCount / 20);
 
-
             for (int i = 0; i <= 20; i++)
             {
                     var servers = _context.Servers.Skip(i * sharding).Take(sharding);
@@ -341,7 +340,7 @@ namespace DSM.UI.Api.Services
                     Notes = x.Notes,
                 });
             }
-            
+
             return ExcelOperations.ExportToExcel(results);
         }
 
