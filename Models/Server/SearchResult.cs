@@ -10,6 +10,5 @@
         public string DnsName { get; set; }
         public string IpAddress { get; set; }
         public string ServiceName { get; set; }
-        public string? Notes { get; set; }
     }
 }
